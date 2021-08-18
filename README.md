@@ -15,9 +15,41 @@ Migrations will be applied automatically when the application container starts. 
 
 ### Building Docker image
 
+Docker images are automatically built by GitHub Actions, and published to https://github.com/renalreg/mauritius-renaldataregistry/pkgs/container/mauritius-renaldataregistry.
+
+You can reference images by various tags:
+
+- Tagged releases will create a new version-tagged image.
+  - E.g. A GitHub release `v1.0.0` will create an image tagged `1.0.0`
+- Pushing to any branch will create a branch-tagged image
+  - E.g. pushing to `main` will update the image tagged `main`
+
 ### Deploying Docker image
 
+To deploy the container:
+
+1. Copy `docker-compose.yml` to the host machine
+2. Create a `.env` file populated as shown below
+3. Run `docker-compose up`
+
 #### Environment variables
+
+Example `.env` file structure:
+
+```ini
+POSTGRES_DB=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+
+DJANGO_SUPERUSER_USERNAME=admin
+DJANGO_SUPERUSER_PASSWORD=changeme
+DJANGO_SUPERUSER_EMAIL=admin@email.com
+
+```
+
+Note: Once the container has started for the first time, you can remove `DJANGO_SUPERUSER_` items from `.env`. They exist only to create the initial superuser account on first-run.
+
+Leaving them in the file won't do any damage, since Django won't create a new user if the username already exists, it's just cleaner to remove it. Doing so will result in an output line `CommandError: You must use --username with --noinput.` which can be safely ignored.
 
 #### Superuser creation
 
