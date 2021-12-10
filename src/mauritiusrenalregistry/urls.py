@@ -16,9 +16,15 @@ Including another URLconf
 from .views import HomePageView
 from django.contrib import admin
 from django.urls import path, include
+from users.views import CustomLoginView
 
 urlpatterns = [
     path("", HomePageView.as_view(), name="home"),
+    path("users/login/", CustomLoginView.as_view(), name="login"),
+    path("users/", include("django.contrib.auth.urls")),
     path("admin/", admin.site.urls),
-    path("renaldataregistry/", include("renaldataregistry.urls")),
+    path(
+        "renaldataregistry/",
+        include("renaldataregistry.urls", namespace="renaldataregistry"),
+    ),
 ]

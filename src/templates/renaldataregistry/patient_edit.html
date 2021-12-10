@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block extrahead %}
+{{ patient_form.media }}
+{% load static %}
+<script src="{% static 'js/form_tabs.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+
+{% if patient_form.non_field_errors %}
+<ul>
+    {% for error in patient_form.non_field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<h1>Edit patient {{ patient.name }}</h1>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-5">
+            <form class="" id="mrr_form" action="" method="post">
+                {% csrf_token %}
+                <div class="tab">
+                    <div class="mb-3">
+                        <h2>Primary details:</h2>
+                    </div>
+                    <div class="mb-3">
+                        {{patient_form.id_type | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patient_form.id | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientregistration_form.health_institution | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientregistration_form.unit | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patient_form.name | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patient_form.surname | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patient_form.dob | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patient_form.gender | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientaddress_form.postcode | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientaddress_form.street | as_crispy_field}}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

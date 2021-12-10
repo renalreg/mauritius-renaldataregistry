@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% load patient_list_extras %}
+
+{% block content %}
+{% if user.is_superuser %}
+<!-- Admin Users -->
+<h1>Patient registration list</h1>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-10">
+            <form action="{% url 'renaldataregistry:PatientRegistrationListView' %}" method="get">
+                <div class="mb-3">
+                    <input id="record_search" type="text" name="search_keyword" value="{{ request.GET.search_keyword }}"
+                        class="form-control"
+                        placeholder="Enter your search term (N.I.C or passport number, name, surname, health institution or unit)" />
+                </div>
+                <div class="mb-3">
+                    <input type="submit" value="Search" class="btn btn-success" />
+                </div>
+            </form>
+            {% if patientregistration_list %}
+            {% if search_word %}
+            <div class="row title-row my-5">
+                <div class="col-12 py-0">
+                    <p class="my-0 py-0">{{ count }} result(s) for <b>{{ search_word }}</b></p>
+                </div>
+            </div>
+            {% endif %}
+            <table class='table table-hover'>
+                <tr>
+                    <th scope='col'>N.I.C or passport no.</th>
+                    <th scope='col'>Name</th>
+                    <th scope='col'>DOB</th>
+                    <th scope='col'>Gender</th>
+                    <th scope='col'>Health institution</th>
+                    <th scope='col'>Unit</th>
+                    <th scope='col'>Actions</th>
+                </tr>
+                {% for patientregistration in patientregistration_list %}
+                <tr>
+                    <td>{{patientregistration.patient.id}}</td>
+                    <td>{{patientregistration.patient.name}} {{patientregistration.patient.surname}}</td>
+                    <td>{{patientregistration.patient.dob}}</td>
+                    <td>{{patientregistration.patient.get_gender_display}}</td>
+                    <td scope='row'>{{patientregistration.health_institution}}</td>
+                    <td scope='row'>{{patientregistration.unit}}</td>
+                    <td><a href="{% url 'renaldataregistry:PatientRegistrationUpdateView' patientregistration.patient.id %}">Edit</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <p>There are no records.</p>
+            {% endif %}
+            <!-- {%else%} normal user -->
+            {% endif %}
+            {% if is_paginated %}
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-left">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% parameter_replace page=1 %}">&laquo; First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link"
+                            href="?{% parameter_replace page=page_obj.previous_page_number %}">previous</a>
+                    </li>
+                    {% endif %}
+                    {% for page_number in page_obj.number|page_window:page_obj.paginator.num_pages %}
+                    <li class="page-item {% if page_number == page_obj.number %}active{% endif %}">
+                        <a class="page-link" href="?{% parameter_replace page=page_number %}">
+                            {{ page_number }}
+                            {% if page_number == page_obj.number %}
+                            of {{ page_obj.paginator.num_pages }}
+                            {% endif %}
+                        </a>
+                    </li>
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% parameter_replace page=page_obj.next_page_number %}">next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?{% parameter_replace page=page_obj.paginator.num_pages %}">last
+                            &raquo;</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

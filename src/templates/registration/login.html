@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-4">
+            <h2>Please Login</h2>
+            <hr>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <input type="email" autofocus name="username" maxlength="254" class="form-control" required
+                        id="id_username" placeholder="you@example.com">
+                </div>
+                <div class="mb-3">
+                    <input type="password" name="password" maxlength="254" class="form-control" required
+                        id="id_password" placeholder="password">
+                </div>
+                <div class="row g-2">
+                    <div class="col-sm">
+                        <button type="submit" class="btn btn-primary btn-customized">Login</button>
+                    </div>
+                    <div class="col-sm-6">
+                        <a class="btn btn-link" href="{% url 'password_reset' %}">Forgot Your Password?</a>
+                    </div>
+                </div>
+            </form>
+            {% if form.errors %}
+            <div class="col-12">
+                <span class="text-danger align-middle">
+                    Your username and password didn't match. Please try again.
+                </span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
