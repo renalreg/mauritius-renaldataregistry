@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
+import secrets
 from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,6 +23,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+# Look for a secret key environment variable, otherwise generate a random key
+# Random key will not persist across sessions, so avoid in production environments!
+SECRET_KEY = os.environ.get("SECRET_KEY", None) or secrets.token_urlsafe(50)
 
 ALLOWED_HOSTS = []
 
