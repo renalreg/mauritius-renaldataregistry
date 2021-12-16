@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
 from django.db.models.fields import NullBooleanField
+
 from users.models import CustomUser
 
 # Create your models here.

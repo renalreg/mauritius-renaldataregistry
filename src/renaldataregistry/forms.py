@@ -1,25 +1,27 @@
-from django import forms
-from crispy_forms.bootstrap import TabHolder, Tab, StrictButton
-from crispy_forms.helper import FormHelper
+import pdb
+
 from bootstrap_datepicker_plus import DatePickerInput
+from crispy_forms.bootstrap import StrictButton, Tab, TabHolder
+from crispy_forms.helper import FormHelper
+from django import forms
+from django.forms import BaseInlineFormSet, inlineformset_factory
+from django.utils.translation import gettext_lazy as _
+
+from utils.mixin import ValidationFormMixin
+
 from .models import (
-    PatientRegistration,
-    Patient,
-    PatientAddress,
-    PatientContact,
-    PatientMeasurement,
-    PatientOccupation,
-    PatientKRTModality,
-    PatientAKImeasurement,
-    PatientAssessment,
     LaboratoryParameter,
     Medication,
+    Patient,
+    PatientAddress,
+    PatientAKImeasurement,
+    PatientAssessment,
+    PatientContact,
+    PatientKRTModality,
+    PatientMeasurement,
+    PatientOccupation,
+    PatientRegistration,
 )
-from utils.mixin import ValidationFormMixin
-from django.forms import inlineformset_factory
-from django.utils.translation import gettext_lazy as _
-from django.forms import BaseInlineFormSet
-import pdb
 
 
 class CustomInlineFormSet(BaseInlineFormSet):

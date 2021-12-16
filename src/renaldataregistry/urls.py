@@ -1,9 +1,9 @@
 from django.urls import path
 
 from .views import (
+    PatientAssessmentView,
     PatientRegistrationListView,
     PatientRegistrationView,
-    PatientAssessmentView,
 )
 
 app_name = "renaldataregistry"

@@ -1,31 +1,32 @@
+import pdb
+
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView, UpdateView
-from renaldataregistry.models import (
-    PatientRegistration,
-    LaboratoryParameter,
-    Patient,
-    PatientAddress,
-)
+from django.db.models import Q
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.generic import CreateView, ListView, UpdateView
+
 from renaldataregistry.forms import (
-    PatientRegistrationForm,
-    PatientForm,
     PatientAddressForm,
-    PatientContactForm,
-    PatientMeasurementForm,
-    PatientOccupationForm,
-    PatientKRTModalityForm,
     PatientAKIMeasurement,
     PatientAssessmentForm,
     PatientAssessmentLPForm,
     PatientAssessmentMedicationForm,
+    PatientContactForm,
     PatientContactFormSet,
+    PatientForm,
+    PatientKRTModalityForm,
+    PatientMeasurementForm,
+    PatientOccupationForm,
+    PatientRegistrationForm,
 )
-from django.shortcuts import get_object_or_404, render
-from django.contrib import messages
-from django.shortcuts import redirect
-from django.db.models import Q
+from renaldataregistry.models import (
+    LaboratoryParameter,
+    Patient,
+    PatientAddress,
+    PatientRegistration,
+)
 
-import pdb
 
 # Create your views here.
 class PatientRegistrationListView(LoginRequiredMixin, ListView):
