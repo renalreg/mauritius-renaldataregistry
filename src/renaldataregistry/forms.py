@@ -22,17 +22,16 @@ from django.forms import BaseInlineFormSet
 import pdb
 
 
-
 class CustomInlineFormSet(BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
         super(CustomInlineFormSet, self).__init__(*args, **kwargs)
         # no_of_forms = len(self)
-        self[0].fields['contactvalue'].label = "Phone No." # phone
-        self[1].fields['contactvalue'].label = "Mobile phone No." # mobile
-        self[2].fields['contactvalue'].label = "Other phone No." # alt_phone1
-        self[3].fields['contactvalue'].label = "Other phone No." # alt_phone2
-        self[4].fields['contactvalue'].label = "Email" # email
-        self[5].fields['contactvalue'].label = "Alternative email" # alt_email
+        self[0].fields["contactvalue"].label = "Phone No."  # phone
+        self[1].fields["contactvalue"].label = "Mobile phone No."  # mobile
+        self[2].fields["contactvalue"].label = "Other phone No."  # alt_phone1
+        self[3].fields["contactvalue"].label = "Other phone No."  # alt_phone2
+        self[4].fields["contactvalue"].label = "Email"  # email
+        self[5].fields["contactvalue"].label = "Alternative email"  # alt_email
         # for i in range(0, no_of_forms):
         #     self[i].fields['contactvalue'].label += "-%d" % (i + 1)
 
@@ -64,8 +63,15 @@ class PatientContactForm(ValidationFormMixin):
         fields = ["contactvalue"]
         # labels = {"contactvalue": "Contact"}
 
-PatientContactFormSet = inlineformset_factory(Patient, PatientContact,
-                                            form=PatientContactForm, formset=CustomInlineFormSet, extra=6)
+
+PatientContactFormSet = inlineformset_factory(
+    Patient,
+    PatientContact,
+    form=PatientContactForm,
+    formset=CustomInlineFormSet,
+    extra=6,
+)
+
 
 class PatientMeasurementForm(ValidationFormMixin):
     class Meta:

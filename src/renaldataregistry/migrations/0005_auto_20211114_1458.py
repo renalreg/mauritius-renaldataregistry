@@ -7,17 +7,22 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('renaldataregistry', '0004_medication_type'),
+        ("renaldataregistry", "0004_medication_type"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='patientregistration',
-            name='id',
+            model_name="patientregistration",
+            name="id",
         ),
         migrations.AlterField(
-            model_name='patientregistration',
-            name='patient',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to='renaldataregistry.patient'),
+            model_name="patientregistration",
+            name="patient",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
+                primary_key=True,
+                serialize=False,
+                to="renaldataregistry.patient",
+            ),
         ),
     ]

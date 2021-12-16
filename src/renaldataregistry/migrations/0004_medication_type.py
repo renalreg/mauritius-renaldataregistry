@@ -6,13 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('renaldataregistry', '0003_remove_patientassessment_medication'),
+        ("renaldataregistry", "0003_remove_patientassessment_medication"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='medication',
-            name='type',
-            field=models.PositiveSmallIntegerField(choices=[(1, 'ESA dose'), (2, 'IV iron dose'), (3, 'Anti-diabetics Y/N'), (4, 'Antihypertensives Y/N')], default=1, verbose_name='Medication type'),
+            model_name="medication",
+            name="type",
+            field=models.PositiveSmallIntegerField(
+                choices=[
+                    (1, "ESA dose"),
+                    (2, "IV iron dose"),
+                    (3, "Anti-diabetics Y/N"),
+                    (4, "Antihypertensives Y/N"),
+                ],
+                default=1,
+                verbose_name="Medication type",
+            ),
         ),
     ]

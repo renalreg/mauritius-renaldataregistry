@@ -7,6 +7,7 @@ from users.models import CustomUser
 
 # Models for registration form
 
+
 class Patient(models.Model):
     TYPE_CHOICES = (
         (1, "N.I.C"),
@@ -91,6 +92,7 @@ class Patient(models.Model):
         null=True,
     )
     updated_at = models.DateTimeField(auto_now=True)
+
 
 class PatientRegistration(models.Model):
     patient = models.OneToOneField(Patient, on_delete=models.CASCADE, primary_key=True)

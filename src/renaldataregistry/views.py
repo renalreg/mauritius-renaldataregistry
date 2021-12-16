@@ -1,6 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView, UpdateView
-from renaldataregistry.models import PatientRegistration, LaboratoryParameter, Patient, PatientAddress
+from renaldataregistry.models import (
+    PatientRegistration,
+    LaboratoryParameter,
+    Patient,
+    PatientAddress,
+)
 from renaldataregistry.forms import (
     PatientRegistrationForm,
     PatientForm,
@@ -59,15 +64,19 @@ class PatientRegistrationListView(LoginRequiredMixin, ListView):
 class PatientRegistrationView(LoginRequiredMixin, UpdateView):
     def get(self, request, patient_id=None):
         try:
-            patient_id=self.kwargs['patient_id']
+            patient_id = self.kwargs["patient_id"]
         except KeyError:
             patient_id = None
         if patient_id:
             patient = get_object_or_404(Patient, id=patient_id)
             patient_form = PatientForm(instance=patient)
             try:
-                patientregistration_form = PatientRegistrationForm(instance=patient.patientregistration)
-                patientaddress_form = PatientAddressForm(instance=patient.patientaddress)
+                patientregistration_form = PatientRegistrationForm(
+                    instance=patient.patientregistration
+                )
+                patientaddress_form = PatientAddressForm(
+                    instance=patient.patientaddress
+                )
             except PatientRegistration.DoesNotExist:
                 patientregistration_form = PatientRegistrationForm()
             except PatientAddress.DoesNotExist:
@@ -158,7 +167,11 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
 
         pdb.set_trace()
 
-        if patient_form.is_valid() and patientregistration_form.is_valid() and patientcontact_form1.is_valid():
+        if (
+            patient_form.is_valid()
+            and patientregistration_form.is_valid()
+            and patientcontact_form1.is_valid()
+        ):
             patient = patient_form.save(commit=False)
             # patient.save()
 
@@ -169,7 +182,10 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
             patientcontactform1 = patientcontact_form1.save(commit=False)
             patientcontactform1.patient = patient
 
-            if patientcontact_form1.instance.patientcontact_set-0-contactvalue is not None:
+            if (
+                patientcontact_form1.instance.patientcontact_set - 0 - contactvalue
+                is not None
+            ):
                 patientcontact_form1.instance.contactchannel = "P"
             # patientcontactform1.save()
 
