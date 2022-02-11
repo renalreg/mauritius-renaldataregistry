@@ -9,4 +9,4 @@ class CustomLoginView(SuccessMessageMixin, LoginView):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return HttpResponseRedirect("/")
-        return super(LoginView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)

@@ -1,7 +1,7 @@
 from django import forms
-from crispy_forms.bootstrap import TabHolder, Tab, StrictButton
-from crispy_forms.helper import FormHelper
-from bootstrap_datepicker_plus import DatePickerInput
+from django.forms import BaseInlineFormSet, inlineformset_factory
+from bootstrap_datepicker_plus.widgets import DatePickerInput  # type: ignore
+from utils.mixin import ValidationFormMixin
 from .models import (
     PatientRegistration,
     Patient,
@@ -9,32 +9,46 @@ from .models import (
     PatientContact,
     PatientMeasurement,
     PatientOccupation,
+    PatientRenalDiagnosis,
     PatientKRTModality,
     PatientAKImeasurement,
     PatientAssessment,
     LaboratoryParameter,
     Medication,
+    PatientStop,
 )
-from utils.mixin import ValidationFormMixin
-from django.forms import inlineformset_factory
-from django.utils.translation import gettext_lazy as _
-from django.forms import BaseInlineFormSet
-import pdb
-
 
 
 class CustomInlineFormSet(BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
-        super(CustomInlineFormSet, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # no_of_forms = len(self)
-        self[0].fields['contactvalue'].label = "Phone No." # phone
-        self[1].fields['contactvalue'].label = "Mobile phone No." # mobile
-        self[2].fields['contactvalue'].label = "Other phone No." # alt_phone1
-        self[3].fields['contactvalue'].label = "Other phone No." # alt_phone2
-        self[4].fields['contactvalue'].label = "Email" # email
-        self[5].fields['contactvalue'].label = "Alternative email" # alt_email
+        self[0].fields["contactvalue"].label = "Phone No."  # phone
+        self[1].fields["contactvalue"].label = "Mobile phone No."  # mobile
+        self[2].fields["contactvalue"].label = "Other phone No."  # alt_phone1
+        self[3].fields["contactvalue"].label = "Other phone No."  # alt_phone2
+        self[4].fields["contactvalue"].label = "Email"  # email
+        self[5].fields["contactvalue"].label = "Alternative email"  # alt_email
         # for i in range(0, no_of_forms):
         #     self[i].fields['contactvalue'].label += "-%d" % (i + 1)
+
+
+class CustomMeasurementInlineFormSet(BaseInlineFormSet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self[0].fields["measurementvalue"].label = "Height (cm)"
+        self[1].fields["measurementvalue"].label = "Weight (kg)"
+        self[2].fields["measurementvalue"].label = "Birth weight (kg)"
+
+
+class CustomOccupationInlineFormSet(BaseInlineFormSet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self[0].fields["occupation"].label = "Current employment"
+        self[1].fields["occupation"].label = "Significant previous occupation 1"
+        self[2].fields["occupation"].label = "Significant previous occupation 2"
+        self[3].fields["occupation"].label = "Significant previous occupation 3"
+        self[4].fields["occupation"].label = "Significant previous occupation 4"
 
 
 class PatientRegistrationForm(ValidationFormMixin):
@@ -46,7 +60,17 @@ class PatientRegistrationForm(ValidationFormMixin):
 class PatientForm(ValidationFormMixin):
     class Meta:
         model = Patient
-        exclude = ["created_by", "updated_by"]
+        fields = [
+            "pid",
+            "id_type",
+            "name",
+            "surname",
+            "dob",
+            "ethnic",
+            "gender",
+            "maritalstatus",
+            "occupationalstatus",
+        ]
         widgets = {
             "dob": DatePickerInput(format="%d/%m/%Y"),
         }
@@ -62,44 +86,111 @@ class PatientContactForm(ValidationFormMixin):
     class Meta:
         model = PatientContact
         fields = ["contactvalue"]
-        # labels = {"contactvalue": "Contact"}
 
-PatientContactFormSet = inlineformset_factory(Patient, PatientContact,
-                                            form=PatientContactForm, formset=CustomInlineFormSet, extra=6)
+
+PatientContactFormSet = inlineformset_factory(
+    Patient,
+    PatientContact,
+    form=PatientContactForm,
+    formset=CustomInlineFormSet,
+    extra=6,
+)
+
 
 class PatientMeasurementForm(ValidationFormMixin):
     class Meta:
         model = PatientMeasurement
         fields = ["measurementvalue"]
-        labels = {"measurementvalue": ""}
+
+
+PatientMeasurementFormSet = inlineformset_factory(
+    Patient,
+    PatientMeasurement,
+    form=PatientMeasurementForm,
+    formset=CustomMeasurementInlineFormSet,
+    extra=3,
+)
 
 
 class PatientOccupationForm(ValidationFormMixin):
     class Meta:
         model = PatientOccupation
         fields = ["occupation"]
-        labels = {"occupation": ""}
+
+
+PatientOccupationFormSet = inlineformset_factory(
+    Patient,
+    PatientOccupation,
+    form=PatientOccupationForm,
+    formset=CustomOccupationInlineFormSet,
+    extra=5,
+)
+
+
+class PatientRenalDiagnosisForm(ValidationFormMixin):
+    class Meta:
+        model = PatientRenalDiagnosis
+        fields = ["renaldiagnosis"]
 
 
 class PatientKRTModalityForm(ValidationFormMixin):
     class Meta:
         model = PatientKRTModality
-        exclude = ["created_by", "updated_by"]
+        fields = [
+            "modality",
+            "start_date",
+            "hd_unit",
+            "hd_initialaccess",
+            "hd_sessions",
+            "hd_minssessions",
+            "hd_adequacy_urr",
+            "hd_adequacy_kt",
+            "hd_ntcreason",
+            "pd_exchangesday",
+            "pd_fluidlitresday",
+            "pd_adequacy",
+            "pd_bp",
+            "before_KRT",
+            "ropdorprivnephr_days",
+            "hepB_vac",
+            "delay_start",
+            "delay_beforedialysis",
+            "hd_unusedavfavgreason",
+            "pd_catheterdays",
+            "pd_insertiontechnique",
+        ]
         widgets = {
             "start_date": DatePickerInput(format="%d/%m/%Y"),
         }
 
 
-class PatientAKIMeasurement(ValidationFormMixin):
+PatientKRTModalityFormSet = inlineformset_factory(
+    Patient,
+    PatientKRTModality,
+    form=PatientKRTModalityForm,
+    extra=6,
+)
+
+
+class PatientAKIMeasurementForm(ValidationFormMixin):
     class Meta:
         model = PatientAKImeasurement
-        fields = ["creatinine", "egfr", "measurement_date"]
+        fields = ["creatinine", "egfr", "hb", "measurement_date"]
 
 
 class PatientAssessmentForm(ValidationFormMixin):
     class Meta:
         model = PatientAssessment
-        exclude = ["created_by", "updated_by"]
+        fields = [
+            "comorbidity",
+            "disability",
+            "smokingstatus",
+            "alcoholuse",
+            "hepatitis_b",
+            "hepatitis_c",
+            "hiv",
+            "posthd_weight",
+        ]
 
 
 class PatientAssessmentLPForm(forms.Form):
@@ -107,8 +198,8 @@ class PatientAssessmentLPForm(forms.Form):
         super().__init__(*args, **kwargs)
         all_lp = LaboratoryParameter.objects.all()
 
-        for i in range(len(all_lp)):
-            field_name = all_lp[i].parameter
+        for _, laboratory_parameter in enumerate(all_lp):
+            field_name = laboratory_parameter.parameter
             self.fields[field_name] = forms.DecimalField(
                 decimal_places=2, max_digits=5, required=False
             )
@@ -119,17 +210,23 @@ class PatientAssessmentMedicationForm(forms.Form):
         super().__init__(*args, **kwargs)
         all_med = Medication.objects.all()
 
-        ANS_CHOICES = (
+        answer_choices = (
             (1, "Yes"),
             (2, "No"),
         )
 
-        for i in range(len(all_med)):
-            field_name = all_med[i].medication
+        for _, medication in enumerate(all_med):
+            field_name = medication.medication
 
-            if all_med[i].type == 3 or all_med[i].type == 4:
-                self.fields[field_name] = forms.ChoiceField(choices=ANS_CHOICES)
+            if medication.type in (3, 4):
+                self.fields[field_name] = forms.ChoiceField(choices=answer_choices)
             else:
                 self.fields[field_name] = forms.DecimalField(
                     decimal_places=2, max_digits=5, required=False
                 )
+
+
+class PatientStopForm(ValidationFormMixin):
+    class Meta:
+        model = PatientStop
+        fields = ["last_dialysis_date", "stop_reason", "dod", "cause_of_death"]

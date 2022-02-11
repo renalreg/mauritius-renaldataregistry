@@ -1,26 +1,36 @@
+from django.forms import inlineformset_factory
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView, UpdateView
-from renaldataregistry.models import PatientRegistration, LaboratoryParameter, Patient, PatientAddress
-from renaldataregistry.forms import (
-    PatientRegistrationForm,
-    PatientForm,
-    PatientAddressForm,
-    PatientContactForm,
-    PatientMeasurementForm,
-    PatientOccupationForm,
-    PatientKRTModalityForm,
-    PatientAKIMeasurement,
-    PatientAssessmentForm,
-    PatientAssessmentLPForm,
-    PatientAssessmentMedicationForm,
-    PatientContactFormSet,
-)
 from django.shortcuts import get_object_or_404, render
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.db.models import Q
-
-import pdb
+from renaldataregistry.models import (
+    PatientRegistration,
+    Patient,
+    PatientAddress,
+    PatientContact,
+    PatientRenalDiagnosis,
+    PatientAKImeasurement,
+)
+from renaldataregistry.forms import (
+    PatientRegistrationForm,
+    PatientForm,
+    PatientAddressForm,
+    PatientRenalDiagnosisForm,
+    PatientAKIMeasurementForm,
+    PatientAssessmentForm,
+    PatientAssessmentLPForm,
+    PatientAssessmentMedicationForm,
+    PatientContactFormSet,
+    PatientStopForm,
+    PatientMeasurementFormSet,
+    PatientOccupationFormSet,
+    PatientKRTModalityFormSet,
+    PatientKRTModalityForm,
+    CustomInlineFormSet,
+    PatientContactForm,
+)
 
 # Create your views here.
 class PatientRegistrationListView(LoginRequiredMixin, ListView):
@@ -40,179 +50,207 @@ class PatientRegistrationListView(LoginRequiredMixin, ListView):
             search_word = None
 
         if search_word:
-            print(type(search_word))
             # Search by N.I.C or passport number, name, surname, health institution or unit.
             result_patients = PatientRegistration.objects.filter(
                 Q(unit__name__icontains=search_word)
                 | Q(patient__name__icontains=search_word)
-            )
+            ).order_by("patient__name")
             self.count = result_patients.count()
             return result_patients
-        else:
-            all_patientregistrations = PatientRegistration.objects.prefetch_related(
-                "patient"
-            ).all()
-            self.count = all_patientregistrations.count()
-            return all_patientregistrations
+
+        all_patientregistrations = (
+            PatientRegistration.objects.prefetch_related("patient")
+            .all()
+            .order_by("patient__name")
+        )
+        self.count = all_patientregistrations.count()
+        return all_patientregistrations
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_superuser:
+            context["search_word"] = self.request.GET.get("search_keyword")
+            if context["search_word"]:
+                context["count"] = self.count
+        return context
 
 
 class PatientRegistrationView(LoginRequiredMixin, UpdateView):
-    def get(self, request, patient_id=None):
+    def get(self, request, *args, **kwargs):
+        context = {}
+        template_name = "patient_register.html"
         try:
-            patient_id=self.kwargs['patient_id']
+            patient_id = kwargs["patient_id"]
         except KeyError:
             patient_id = None
         if patient_id:
             patient = get_object_or_404(Patient, id=patient_id)
+            context["patient"] = patient
             patient_form = PatientForm(instance=patient)
+            patientregistration_form = PatientRegistrationForm(
+                instance=patient.patientregistration
+            )
             try:
-                patientregistration_form = PatientRegistrationForm(instance=patient.patientregistration)
-                patientaddress_form = PatientAddressForm(instance=patient.patientaddress)
-            except PatientRegistration.DoesNotExist:
-                patientregistration_form = PatientRegistrationForm()
+                patientaddress_form = PatientAddressForm(
+                    instance=patient.patientaddress
+                )
             except PatientAddress.DoesNotExist:
                 patientaddress_form = PatientAddressForm()
-            template_name = "patient_edit.html"
-            context = {
-                "patient": patient,
-                "patient_form": patient_form,
-                "patientregistration_form": patientregistration_form,
-                "patientaddress_form": patientaddress_form,
-            }
+
+            patient_total_contacts = patient.patientcontact_set.count()
+            # maxcontacts (6)
+            patientcontact_iformset = inlineformset_factory(
+                Patient,
+                PatientContact,
+                form=PatientContactForm,
+                formset=CustomInlineFormSet,
+                extra=6 - patient_total_contacts,
+            )
+            patientcontact_forms = patientcontact_iformset(instance=patient)
+
+            patientmeasurement_forms = PatientMeasurementFormSet(instance=patient)
+            patientoccupation_forms = PatientOccupationFormSet(instance=patient)
+
+            try:
+                patientrenaldiagnosis_form = PatientRenalDiagnosisForm(
+                    instance=patient.patientrenaldiagnosis
+                )
+            except PatientRenalDiagnosis.DoesNotExist:
+                patientrenaldiagnosis_form = PatientRenalDiagnosisForm()
+
+            patientkrtmodality_forms = PatientKRTModalityFormSet(instance=patient)
+
+            try:
+                patientakimeasurement_form = PatientAKIMeasurementForm(
+                    instance=patient.patientakimeasurement
+                )
+            except PatientAKImeasurement.DoesNotExist:
+                patientakimeasurement_form = PatientAKIMeasurementForm()
+
+            patientassessment_form = PatientAssessmentForm(instance=patient)
         else:
             patientregistration_form = PatientRegistrationForm()
             patient_form = PatientForm()
             patientaddress_form = PatientAddressForm()
             patientcontact_forms = PatientContactFormSet()
-            patientmeasurement_form1 = PatientMeasurementForm(auto_id="height_%s")
-            patientmeasurement_form2 = PatientMeasurementForm(auto_id="weight_%s")
-            patientmeasurement_form3 = PatientMeasurementForm(auto_id="birthweight_%s")
-            patientoccupation_form1 = PatientOccupationForm(auto_id="currentemp_%s")
-            patientoccupation_form2 = PatientOccupationForm(auto_id="prevemp1_%s")
-            patientoccupation_form3 = PatientOccupationForm(auto_id="prevemp2_%s")
-            patientoccupation_form4 = PatientOccupationForm(auto_id="prevemp3_%s")
-            patientoccupation_form5 = PatientOccupationForm(auto_id="prevemp4_%s")
-            patientkrtmodality_form1 = PatientKRTModalityForm(
-                auto_id="initialKRTmod_%s"
-            )
-            patientkrtmodality_form2 = PatientKRTModalityForm(auto_id="otherKRTmod1_%s")
-            patientkrtmodality_form3 = PatientKRTModalityForm(auto_id="otherKRTmod2_%s")
-            patientkrtmodality_form4 = PatientKRTModalityForm(auto_id="otherKRTmod3_%s")
-            patientkrtmodality_form5 = PatientKRTModalityForm(auto_id="otherKRTmod4_%s")
-            patientkrtmodality_form6 = PatientKRTModalityForm(
-                auto_id="currentKRTmod_%s"
-            )
-            patientakimeasurement_form = PatientAKIMeasurement()
+            patientmeasurement_forms = PatientMeasurementFormSet()
+            patientoccupation_forms = PatientOccupationFormSet()
+            patientrenaldiagnosis_form = PatientRenalDiagnosisForm()
+            patientkrtmodality_forms = PatientKRTModalityFormSet()
+            patientakimeasurement_form = PatientAKIMeasurementForm()
             patientassessment_form = PatientAssessmentForm()
-            context = {
-                "patientregistration_form": patientregistration_form,
-                "patient_form": patient_form,
-                "patientaddress_form": patientaddress_form,
-                "patientcontact_forms": patientcontact_forms,
-                "patientmeasurement_form1": patientmeasurement_form1,
-                "patientmeasurement_form2": patientmeasurement_form2,
-                "patientmeasurement_form3": patientmeasurement_form3,
-                "patientoccupation_form1": patientoccupation_form1,
-                "patientoccupation_form2": patientoccupation_form2,
-                "patientoccupation_form3": patientoccupation_form3,
-                "patientoccupation_form4": patientoccupation_form4,
-                "patientoccupation_form5": patientoccupation_form5,
-                "patientkrtmodality_form1": patientkrtmodality_form1,
-                "patientkrtmodality_form2": patientkrtmodality_form2,
-                "patientkrtmodality_form3": patientkrtmodality_form3,
-                "patientkrtmodality_form4": patientkrtmodality_form4,
-                "patientkrtmodality_form5": patientkrtmodality_form5,
-                "patientkrtmodality_form6": patientkrtmodality_form6,
-                "patientakimeasurement_form": patientakimeasurement_form,
-                "patientassessment_form": patientassessment_form,
-            }
-            template_name = "patient_register.html"
+        context = {
+            "patientregistration_form": patientregistration_form,
+            "patient_form": patient_form,
+            "patientaddress_form": patientaddress_form,
+            "patientcontact_forms": patientcontact_forms,
+            "patientmeasurement_forms": patientmeasurement_forms,
+            "patientoccupation_forms": patientoccupation_forms,
+            "patientrenaldiagnosis_form": patientrenaldiagnosis_form,
+            "patientkrtmodality_forms": patientkrtmodality_forms,
+            "patientakimeasurement_form": patientakimeasurement_form,
+            "patientassessment_form": patientassessment_form,
+        }
         return render(request, template_name, context)
 
     def post(self, request, *args, **kwargs):
-        patientregistration_form = PatientRegistrationForm(request.POST)
-        patient_form = PatientForm(request.POST)
-        patientaddress_form = PatientAddressForm(request.POST)
-        patientcontact_form1 = PatientContactForm(request.POST)
-        patientcontact_form2 = PatientContactForm(request.POST)
-        patientcontact_form3 = PatientContactForm(request.POST)
-        patientcontact_form4 = PatientContactForm(request.POST)
-        patientcontact_form5 = PatientContactForm(request.POST)
-        patientcontact_form6 = PatientContactForm(request.POST)
-        patientmeasurement_form1 = PatientMeasurementForm(request.POST)
-        patientmeasurement_form2 = PatientMeasurementForm(request.POST)
-        patientmeasurement_form3 = PatientMeasurementForm(request.POST)
-        patientoccupation_form1 = PatientOccupationForm(request.POST)
-        patientoccupation_form2 = PatientOccupationForm(request.POST)
-        patientoccupation_form3 = PatientOccupationForm(request.POST)
-        patientoccupation_form4 = PatientOccupationForm(request.POST)
-        patientoccupation_form5 = PatientOccupationForm(request.POST)
-        patientkrtmodality_form1 = PatientKRTModalityForm(request.POST)
-        patientkrtmodality_form2 = PatientKRTModalityForm(request.POST)
-        patientkrtmodality_form3 = PatientKRTModalityForm(request.POST)
-        patientkrtmodality_form4 = PatientKRTModalityForm(request.POST)
-        patientkrtmodality_form5 = PatientKRTModalityForm(request.POST)
-        patientkrtmodality_form6 = PatientKRTModalityForm(request.POST)
-        patientakimeasurement_form = PatientAKIMeasurement(request.POST)
-        patientassessment_form = PatientAssessmentForm(request.POST)
+        try:
+            patient_id = kwargs["patient_id"]
+        except KeyError:
+            patient_id = None
+        if patient_id:
+            patient = get_object_or_404(Patient, id=patient_id)
 
-        pdb.set_trace()
+            patientregistration_form = PatientRegistrationForm(
+                request.POST, instance=patient.patientregistration
+            )
+            patient_form = PatientForm(request.POST, instance=patient)
 
-        if patient_form.is_valid() and patientregistration_form.is_valid() and patientcontact_form1.is_valid():
-            patient = patient_form.save(commit=False)
-            # patient.save()
+            try:
+                patientaddress_form = PatientAddressForm(
+                    request.POST, instance=patient.patientaddress
+                )
+            except PatientAddress.DoesNotExist:
+                patientaddress_form = PatientAddressForm()
+
+            patientcontact_forms = PatientContactFormSet(request.POST, instance=patient)
+            patientmeasurement_forms = PatientMeasurementFormSet(
+                request.POST, instance=patient
+            )
+            patientoccupation_forms = PatientOccupationFormSet(
+                request.POST, instance=patient
+            )
+            try:
+                patientrenaldiagnosis_form = PatientRenalDiagnosisForm(
+                    request.POST, instance=patient.patientrenaldiagnosis
+                )
+            except PatientRenalDiagnosis.DoesNotExist:
+                patientrenaldiagnosis_form = PatientRenalDiagnosisForm()
+            patientkrtmodality_forms = PatientKRTModalityFormSet(
+                request.POST, instance=patient
+            )
+            try:
+                patientakimeasurement_form = PatientAKIMeasurementForm(
+                    request.POST, instance=patient.patientakimeasurement
+                )
+            except PatientAKImeasurement.DoesNotExist:
+                patientakimeasurement_form = PatientAKIMeasurementForm()
+            patientassessment_form = PatientAssessmentForm(
+                request.POST, instance=patient
+            )
+        else:
+            patientregistration_form = PatientRegistrationForm(request.POST)
+            patient_form = PatientForm(request.POST)
+            patientaddress_form = PatientAddressForm(request.POST)
+            patientcontact_forms = PatientContactFormSet(request.POST)
+            patientmeasurement_forms = PatientMeasurementFormSet(request.POST)
+            patientoccupation_forms = PatientOccupationFormSet(request.POST)
+            patientrenaldiagnosis_form = PatientRenalDiagnosisForm(request.POST)
+            patientkrtmodality_forms = PatientKRTModalityFormSet(request.POST)
+            patientakimeasurement_form = PatientAKIMeasurementForm(request.POST)
+            patientassessment_form = PatientAssessmentForm(request.POST)
+
+        if (
+            patient_form.is_valid()
+            and patientregistration_form.is_valid()
+            and patientcontact_forms.is_valid()
+        ):
+            # to complete - save only on change
+            patient = patient_form.save()
 
             patientregistration = patientregistration_form.save(commit=False)
             patientregistration.patient = patient
-            # patientregistration.save()
+            patientregistration.save()
 
-            patientcontactform1 = patientcontact_form1.save(commit=False)
-            patientcontactform1.patient = patient
-
-            if patientcontact_form1.instance.patientcontact_set-0-contactvalue is not None:
-                patientcontact_form1.instance.contactchannel = "P"
-            # patientcontactform1.save()
+            patientcontacts = patientcontact_forms.save(commit=False)
+            for patientcontact in patientcontacts:
+                patientcontact.patient = patient
+                patientcontact.save()
 
             messages.success(
                 self.request,
-                "Completed - new patient added",
+                "Completed",
                 extra_tags="alert",
             )
             return redirect("renaldataregistry:PatientRegistrationListView")
-        else:
-            messages.error(
-                self.request,
-                "Patient creation failed - see below",
-                extra_tags="alert",
-            )
-            context = {
-                "patientregistration_form": patientregistration_form,
-                "patient_form": patient_form,
-                "patientaddress_form": patientaddress_form,
-                "patientcontact_form1": patientcontact_form1,
-                "patientcontact_form2": patientcontact_form2,
-                "patientcontact_form3": patientcontact_form3,
-                "patientcontact_form4": patientcontact_form4,
-                "patientcontact_form5": patientcontact_form5,
-                "patientcontact_form6": patientcontact_form6,
-                "patientmeasurement_form1": patientmeasurement_form1,
-                "patientmeasurement_form2": patientmeasurement_form2,
-                "patientmeasurement_form3": patientmeasurement_form3,
-                "patientoccupation_form1": patientoccupation_form1,
-                "patientoccupation_form2": patientoccupation_form2,
-                "patientoccupation_form3": patientoccupation_form3,
-                "patientoccupation_form4": patientoccupation_form4,
-                "patientoccupation_form5": patientoccupation_form5,
-                "patientkrtmodality_form1": patientkrtmodality_form1,
-                "patientkrtmodality_form2": patientkrtmodality_form2,
-                "patientkrtmodality_form3": patientkrtmodality_form3,
-                "patientkrtmodality_form4": patientkrtmodality_form4,
-                "patientkrtmodality_form5": patientkrtmodality_form5,
-                "patientkrtmodality_form6": patientkrtmodality_form6,
-                "patientakimeasurement_form": patientakimeasurement_form,
-                "patientassessment_form": patientassessment_form,
-            }
-            return render(request, "patient_register.html", context)
+        messages.error(
+            self.request,
+            "The action was not completed. Please see below",
+            extra_tags="alert",
+        )
+        context = {
+            "patientregistration_form": patientregistration_form,
+            "patient_form": patient_form,
+            "patientaddress_form": patientaddress_form,
+            "patientcontact_forms": patientcontact_forms,
+            "patientmeasurement_forms": patientmeasurement_forms,
+            "patientoccupation_forms": patientoccupation_forms,
+            "patientrenaldiagnosis_form": patientrenaldiagnosis_form,
+            "patientkrtmodality_forms": patientkrtmodality_forms,
+            "patientakimeasurement_form": patientakimeasurement_form,
+            "patientassessment_form": patientassessment_form,
+        }
+        return render(request, "patient_register.html", context)
 
 
 class PatientAssessmentView(LoginRequiredMixin, CreateView):
@@ -228,3 +266,76 @@ class PatientAssessmentView(LoginRequiredMixin, CreateView):
             "patientassessment_form": patientassessment_form,
         }
         return render(request, "patient_assess.html", context)
+
+
+class PatientModalityView(LoginRequiredMixin, CreateView):
+    def get(self, request, *args, **kwargs):
+        patientkrtmodality_form = PatientKRTModalityForm()
+        patientakimeasurement_form = PatientAKIMeasurementForm()
+        context = {
+            "patientkrtmodality_form": patientkrtmodality_form,
+            "patientakimeasurement_form": patientakimeasurement_form,
+        }
+        return render(request, "patient_modality.html", context)
+
+
+class PatientStopView(LoginRequiredMixin, CreateView):
+    def get(self, request, *args, **kwargs):
+        patientstop_form = PatientStopForm()
+        context = {
+            "patientstop_form": patientstop_form,
+        }
+        return render(request, "patient_stop.html", context)
+
+
+class PatientRegistrationUpdateView(LoginRequiredMixin, UpdateView):
+    def get(self, request, *args, **kwargs):
+        try:
+            patient_id = kwargs["patient_id"]
+        except KeyError:
+            patient_id = None
+        if patient_id:
+            patient = get_object_or_404(Patient, id=patient_id)
+            try:
+                patientregistration_form = PatientRegistrationForm(
+                    instance=patient.patientregistration
+                )
+            except PatientRegistration.DoesNotExist:
+                patientregistration_form = PatientRegistrationForm()
+            context = {
+                "patient": patient,
+                "patientregistration_form": patientregistration_form,
+            }
+            return render(request, "patientregistration_edit.html", context)
+        return redirect("renaldataregistry:PatientRegistrationListView")
+
+    def post(self, request, *args, **kwargs):
+        patientregistration_form = PatientRegistrationForm(request.POST)
+        if patientregistration_form.is_valid():
+            try:
+                patient_id = self.kwargs["patient_id"]
+            except KeyError:
+                patient_id = None
+            if patient_id:
+                patient = get_object_or_404(Patient, id=patient_id)
+
+            patientregistration = patientregistration_form.save(commit=False)
+            patientregistration.patient = patient
+            patientregistration.save(
+                update_fields=["health_institution", "unit", "updated_at"]
+            )
+            messages.success(
+                self.request,
+                "Completed - patient registration updated",
+                extra_tags="alert",
+            )
+            return redirect("renaldataregistry:PatientRegistrationListView")
+        messages.error(
+            self.request,
+            "Patient registration update failed - see below",
+            extra_tags="alert",
+        )
+        context = {
+            "patientregistration_form": patientregistration_form,
+        }
+        return render(request, "patientregistration_edit.html", context)

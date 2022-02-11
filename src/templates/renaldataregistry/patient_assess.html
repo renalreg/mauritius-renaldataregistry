@@ -4,6 +4,7 @@
 {{ patient_form.media }}
 {% load static %}
 <script src="{% static 'js/form_tabs.js' %}"></script>
+<script src="{% static 'js/patient_assess.js' %}"></script>
 <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 {% endblock %}
 
@@ -26,6 +27,14 @@
                 {% csrf_token %}
                 <div class="tab">
                     <div class="mb-3">
+                        Health institution: {{ patient.patientregistration.health_institution }}
+                    </div>
+                    <div class="mb-3">
+                        Unit: {{ patient.patientregistration.unit }}
+                    </div>
+                </div>
+                <div class="tab">
+                    <div class="mb-3">
                         <h2>KRT modality:</h2>
                     </div>
                     <div class="p-3 mb-2 bg-info text-dark">
@@ -37,10 +46,13 @@
                         </div>
                     </div>
                     <div class="mb-3">
-                        {{patientkrtmodality_form.hd_initialaccess | as_crispy_field}}
+                        {{patientassessment_form.posthd_weight | as_crispy_field}}
                     </div>
                     <div class="mb-3">
-                        {{patientkrtmodality_form.hd_ntcreason | as_crispy_field}}
+                        {{patientkrtmodality_form.hd_unit | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientkrtmodality_form.hd_initialaccess | as_crispy_field}}
                     </div>
                     <div class="mb-3">
                         {{patientkrtmodality_form.hd_sessions | as_crispy_field}}
@@ -53,6 +65,9 @@
                     </div>
                     <div class="mb-3">
                         {{patientkrtmodality_form.hd_adequacy_kt | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientkrtmodality_form.hd_ntcreason | as_crispy_field}}
                     </div>
                     <div class="mb-3">
                         {{patientkrtmodality_form.pd_exchangesday | as_crispy_field}}
@@ -114,6 +129,7 @@
                     <button type="button" class="nextBtn btn btn-primary btn-block btn-sm">Next</button>
                 </div>
                 <div style="text-align:center;margin-top:40px;">
+                    <span class="step"></span>
                     <span class="step"></span>
                     <span class="step"></span>
                     <span class="step"></span>

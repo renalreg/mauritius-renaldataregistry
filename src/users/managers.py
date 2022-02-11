@@ -12,7 +12,7 @@ class CustomUserManager(BaseUserManager):
         """
         Not case-sensitive username
         """
-        case_insensitive_username_field = "{}__iexact".format(self.model.USERNAME_FIELD)
+        case_insensitive_username_field = f"{self.model.USERNAME_FIELD}__iexact"
         return self.get(**{case_insensitive_username_field: username})
 
     def create_user(self, email, password, **extra_fields):

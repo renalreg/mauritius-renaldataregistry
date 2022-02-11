@@ -4,6 +4,9 @@ from .views import (
     PatientRegistrationListView,
     PatientRegistrationView,
     PatientAssessmentView,
+    PatientModalityView,
+    PatientStopView,
+    PatientRegistrationUpdateView,
 )
 
 app_name = "renaldataregistry"
@@ -22,11 +25,26 @@ urlpatterns = [
     path(
         "patient/<int:patient_id>/edit/",
         PatientRegistrationView.as_view(),
-        name="PatientRegistrationUpdateView",
+        name="PatientUpdateView",
     ),
     path(
         "patient/assess/",
         PatientAssessmentView.as_view(),
         name="PatientAssessmentView",
+    ),
+    path(
+        "patient/krtmodality/",
+        PatientModalityView.as_view(),
+        name="PatientModalityView",
+    ),
+    path(
+        "patient/stopdialysis/",
+        PatientStopView.as_view(),
+        name="PatientStopView",
+    ),
+    path(
+        "patientregistration/<int:patient_id>/update/",
+        PatientRegistrationUpdateView.as_view(),
+        name="PatientRegistrationUpdateView",
     ),
 ]
