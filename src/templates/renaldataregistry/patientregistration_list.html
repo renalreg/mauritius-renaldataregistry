@@ -35,24 +35,27 @@
                     <th scope='col'>Gender</th>
                     <th scope='col'>Health institution</th>
                     <th scope='col'>Unit</th>
-                    <th scope='col'>Actions</th>
+                    <th colspan="2" scope="colgroup">Actions</th>
                 </tr>
                 {% for patientregistration in patientregistration_list %}
                 <tr>
-                    <td>{{patientregistration.patient.id}}</td>
+                    <td>{{patientregistration.patient.pid}}</td>
                     <td>{{patientregistration.patient.name}} {{patientregistration.patient.surname}}</td>
                     <td>{{patientregistration.patient.dob}}</td>
                     <td>{{patientregistration.patient.get_gender_display}}</td>
                     <td scope='row'>{{patientregistration.health_institution}}</td>
                     <td scope='row'>{{patientregistration.unit}}</td>
-                    <td><a href="{% url 'renaldataregistry:PatientRegistrationUpdateView' patientregistration.patient.id %}">Edit</a></td>
+                    <td><a
+                            href="{% url 'renaldataregistry:PatientUpdateView' patientregistration.patient.id %}">Edit</a>
+                    </td>
+                    <td><a
+                            href="{% url 'renaldataregistry:PatientRegistrationUpdateView' patientregistration.patient.id %}">Move</a>
+                    </td>
                 </tr>
                 {% endfor %}
             </table>
             {% else %}
             <p>There are no records.</p>
-            {% endif %}
-            <!-- {%else%} normal user -->
             {% endif %}
             {% if is_paginated %}
             <nav aria-label="Page navigation example">
@@ -91,4 +94,5 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% endblock %}

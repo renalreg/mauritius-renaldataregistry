@@ -29,9 +29,6 @@ DEBUG = True
 # Random key will not persist across sessions, so avoid in production environments!
 SECRET_KEY = os.environ.get("SECRET_KEY", None) or secrets.token_urlsafe(50)
 
-ALLOWED_HOSTS = []
-
-
 # Application definition
 
 INSTALLED_APPS = [

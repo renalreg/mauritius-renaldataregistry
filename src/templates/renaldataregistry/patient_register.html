@@ -4,6 +4,7 @@
 {{ patient_form.media }}
 {% load static %}
 <script src="{% static 'js/form_tabs.js' %}"></script>
+<script src="{% static 'js/patient_register.js' %}"></script>
 <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 {% endblock %}
 
@@ -32,7 +33,7 @@
                         {{patient_form.id_type | as_crispy_field}}
                     </div>
                     <div class="mb-3">
-                        {{patient_form.id | as_crispy_field}}
+                        {{patient_form.pid | as_crispy_field}}
                     </div>
                     <div class="mb-3">
                         {{patientregistration_form.health_institution | as_crispy_field}}
@@ -69,18 +70,12 @@
                     <div class="mb-3">
                         <h2>Other details:</h2>
                     </div>
+                    {{ patientmeasurement_forms.management_form }}
+                    {% for form in patientmeasurement_forms %}
                     <div class="mb-3">
-                        <label class="col-form-label">Height (cm)</label>
-                        {{patientmeasurement_form1.measurementvalue | as_crispy_field}}
+                        {{ form.measurementvalue | as_crispy_field}}
                     </div>
-                    <div class="mb-3">
-                        <label class="col-form-label">Weight (kg)</label>
-                        {{patientmeasurement_form2.measurementvalue | as_crispy_field}}
-                    </div>
-                    <div class="mb-3">
-                        <label class="col-form-label">Birth weight (kg)</label>
-                        {{patientmeasurement_form3.measurementvalue | as_crispy_field}}
-                    </div>
+                    {% endfor %}
                     <div class="mb-3">
                         {{patient_form.ethnic | as_crispy_field}}
                     </div>
@@ -90,89 +85,25 @@
                     <div class="mb-3">
                         {{patient_form.occupationalstatus | as_crispy_field}}
                     </div>
+                    {{ patientoccupation_forms.management_form }}
+                    {% for form in patientoccupation_forms %}
                     <div class="mb-3">
-                        <label class="col-form-label">Current employment</label>
-                        {{patientoccupation_form1.occupation | as_crispy_field}}
+                        {{ form.occupation | as_crispy_field}}
                     </div>
-                    <div class="mb-3">
-                        <label class="col-form-label">Significant previous occupation 1</label>
-                        {{patientoccupation_form2.occupation | as_crispy_field}}
-                    </div>
-                    <div class="mb-3">
-                        <label class="col-form-label">Significant previous occupation 2</label>
-                        {{patientoccupation_form3.occupation | as_crispy_field}}
-                    </div>
-                    <div class="mb-3">
-                        <label class="col-form-label">Significant previous occupation 3</label>
-                        {{patientoccupation_form4.occupation | as_crispy_field}}
-                    </div>
-                    <div class="mb-3">
-                        <label class="col-form-label">Significant previous occupation 4</label>
-                        {{patientoccupation_form5.occupation | as_crispy_field}}
-                    </div>
+                    {% endfor %}
                 </div>
                 <div class="tab">
                     <div class="mb-3">
-                        <h2>KRT modality:</h2>
-                    </div>
-                    <p>Give chronology of previous and present KRT modalities</p>
-                    <div class="p-3 mb-2 bg-info text-dark">
-                        <legend>First KRT modality</legend>
-                        <div class="row g-2">
-                            <div class="col-sm">
-                                {{patientkrtmodality_form1.modality | as_crispy_field}}
-                            </div>
-                            <div class="col-sm-6">
-                                {{patientkrtmodality_form1.start_date | as_crispy_field}}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row g-2">
-                        <div class="col-sm">
-                            {{patientkrtmodality_form2.modality | as_crispy_field}}
-                        </div>
-                        <div class="col-sm-6">
-                            {{patientkrtmodality_form2.start_date | as_crispy_field}}
-                        </div>
-                    </div>
-                    <div class="row g-2">
-                        <div class="col-sm">
-                            {{patientkrtmodality_form3.modality | as_crispy_field}}
-                        </div>
-                        <div class="col-sm-6">
-                            {{patientkrtmodality_form3.start_date | as_crispy_field}}
-                        </div>
-                    </div>
-                    <div class="row g-2">
-                        <div class="col-sm">
-                            {{patientkrtmodality_form4.modality | as_crispy_field}}
-                        </div>
-                        <div class="col-sm-6">
-                            {{patientkrtmodality_form4.start_date | as_crispy_field}}
-                        </div>
-                    </div>
-                    <div class="row g-2">
-                        <div class="col-sm">
-                            {{patientkrtmodality_form5.modality | as_crispy_field}}
-                        </div>
-                        <div class="col-sm-6">
-                            {{patientkrtmodality_form5.start_date | as_crispy_field}}
-                        </div>
-                    </div>
-                    <div class="p-3 mb-2 bg-info text-dark">
-                        <legend>Present KRT modality</legend>
-                        <div class="row g-2">
-                            <div class="col-sm">
-                                {{patientkrtmodality_form6.modality | as_crispy_field}}
-                            </div>
-                            <div class="col-sm-6">
-                                {{patientkrtmodality_form6.start_date | as_crispy_field}}
-                            </div>
-                        </div>
+                        <h2>Primary renal diagnosis and KRT modality:</h2>
                     </div>
                     <div class="mb-3">
-                        {{patientkrtmodality_form1.hd_unit | as_crispy_field}}
+                        {{patientrenaldiagnosis_form.renaldiagnosis | as_crispy_field}}
                     </div>
+                    <p>Is patient on Kidney Replacement Therapy (KRT)?</p>
+                    <select name="krt_status" id="id_krt_status">
+                        <option value=1>Yes</option>
+                        <option value=0>No</option>
+                    </Select>
                     <div class="mb-3">
                         {{patientakimeasurement_form.creatinine | as_crispy_field}}
                     </div>
@@ -182,9 +113,44 @@
                     <div class="mb-3">
                         {{patientakimeasurement_form.measurement_date | as_crispy_field}}
                     </div>
-                    <div class="mb-3">
-                        {{patientkrtmodality_form1.hd_initialaccess | as_crispy_field}}
+                    <p>Give chronology of previous and present KRT modalities</p>
+                    {{ patientkrtmodality_forms.management_form }}
+                    {% for form in patientkrtmodality_forms %}
+                    {% if forloop.first %}
+                    <div class="p-3 mb-2 bg-info text-dark">
+                        <legend>First KRT modality</legend>
+                        <div class="row g-2">
+                            <div class="col-sm">
+                                {{form.modality | as_crispy_field}}
+                            </div>
+                            <div class="col-sm-6">
+                                {{form.start_date | as_crispy_field}}
+                            </div>
+                        </div>
                     </div>
+                    {% elif forloop.last %}
+                    <div class="p-3 mb-2 bg-info text-dark">
+                        <legend>Present KRT modality</legend>
+                        <div class="row g-2">
+                            <div class="col-sm">
+                                {{form.modality | as_crispy_field}}
+                            </div>
+                            <div class="col-sm-6">
+                                {{form.start_date | as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+                    {%else%}
+                    <div class="row g-2">
+                        <div class="col-sm">
+                            {{form.modality | as_crispy_field}}
+                        </div>
+                        <div class="col-sm-6">
+                            {{form.start_date | as_crispy_field}}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
                 </div>
                 <div class="tab">
                     <div class="mb-3">

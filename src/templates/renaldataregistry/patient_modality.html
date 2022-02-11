@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block extrahead %}
+{{ patient_form.media }}
+{% load static %}
+<script src="{% static 'js/form_tabs.js' %}"></script>
+<script src="{% static 'js/patient_modality.js' %}"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+
+{% if patient_form.non_field_errors %}
+<ul>
+    {% for error in patient_form.non_field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<h1>Start of KRT modality</h1>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-5">
+            <p>There are no KRT modality records for this patient. This is the first KRT modality.</p>
+            <form class="" id="mrr_form" action="" method="post">
+                {% csrf_token %}
+                <div class="tab">
+                    <div class="mb-3">
+                        <h2>New modality:</h2>
+                    </div>
+                    <div class="col-sm">
+                        {{patientkrtmodality_form.modality | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientkrtmodality_form.hd_unit | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientkrtmodality_form.before_KRT | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientkrtmodality_form.ropdorprivnephr_days | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientakimeasurement_form.creatinine | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientakimeasurement_form.egfr | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientakimeasurement_form.hb | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientakimeasurement_form.measurement_date | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientkrtmodality_form.hepB_vac | as_crispy_field}}
+                    </div>
+                </div>
+                <div class="tab">
+                    <div class="mb-3">
+                        {{patientkrtmodality_form.delay_start | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientkrtmodality_form.delay_beforedialysis | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientkrtmodality_form.hd_initialaccess | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientkrtmodality_form.hd_unusedavfavgreason | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientkrtmodality_form.pd_catheterdays | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientkrtmodality_form.pd_insertiontechnique | as_crispy_field}}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <button type="button" class="prevBtn btn btn-primary btn-block btn-sm">Previous</button>
+                    <button type="button" class="nextBtn btn btn-primary btn-block btn-sm">Next</button>
+                </div>
+                <div style="text-align:center;margin-top:40px;">
+                    <span class="step"></span>
+                    <span class="step"></span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

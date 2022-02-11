@@ -1,7 +1,4 @@
 from django.db import models
-from django.db.models.constraints import UniqueConstraint
-from django.db.models.fields import NullBooleanField
-
 from users.models import CustomUser
 
 # Create your models here.
@@ -38,7 +35,7 @@ class Patient(models.Model):
         (3, "Unemployed"),
         (4, "Retired"),
     )
-    id = models.CharField(max_length=14, primary_key=True)
+    pid = models.CharField(max_length=14, unique=True, verbose_name="Unique ID")
     id_type = models.PositiveSmallIntegerField(
         choices=TYPE_CHOICES,
         default=1,
@@ -133,7 +130,7 @@ class HealthInstitution(models.Model):
         (1, "Public"),
         (2, "Private"),
     )
-    code = models.CharField(max_length=5, primary_key=True)
+    code = models.CharField(max_length=5, unique=True)
     name = models.CharField(max_length=100)
     type = models.PositiveSmallIntegerField(
         choices=TYPE_CHOICES,
@@ -162,7 +159,7 @@ class HealthInstitution(models.Model):
 
 
 class Unit(models.Model):
-    number = models.CharField(max_length=8, primary_key=True)
+    number = models.CharField(max_length=8, unique=True)
     name = models.CharField(max_length=100)
     healthinstitution = models.ForeignKey(
         "HealthInstitution",
@@ -193,7 +190,7 @@ class Unit(models.Model):
 
 
 class HDUnit(models.Model):
-    code = models.CharField(max_length=3, primary_key=True)
+    code = models.CharField(max_length=3, unique=True)
     name = models.CharField(max_length=100, unique=True)
     created_by = models.ForeignKey(
         CustomUser,
@@ -218,7 +215,7 @@ class HDUnit(models.Model):
 
 class RenalDiagnosis(models.Model):
     # code: ERA-EDTA CODE (4 digits code)
-    code = models.PositiveSmallIntegerField(primary_key=True)
+    code = models.PositiveSmallIntegerField(unique=True)
     name = models.CharField(
         max_length=100,
         blank=True,
@@ -240,6 +237,9 @@ class RenalDiagnosis(models.Model):
         null=True,
     )
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name + " (" + str(self.code) + ")"
 
 
 class Comorbidity(models.Model):
@@ -436,8 +436,10 @@ class PatientRenalDiagnosis(models.Model):
     patient = models.OneToOneField(Patient, on_delete=models.CASCADE, primary_key=True)
     renaldiagnosis = models.ForeignKey(
         "RenalDiagnosis",
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         verbose_name="Primary renal diagnosis",
+        blank=True,
+        null=True,
     )
     created_by = models.ForeignKey(
         CustomUser,
@@ -533,6 +535,32 @@ class PatientKRTModality(models.Model):
         (4, "No veins"),
         (5, "Patient choice"),
     )
+    BEFOREKRT_CHOICES = (
+        ("U", "Unknown"),
+        ("ROPD", "ROPD"),
+        ("MOPD", "MOPD"),
+        ("LHC", "LHC"),
+        ("OTHER_DR", "Other hospital Dr"),
+        ("PRIV_NEPHR", "Private Nephrologist"),
+        ("OTHER_PRIV_DR", "Other private Dr"),
+    )
+    Y_N_CHOICES = (
+        ("Y", "Yes"),
+        ("N", "No"),
+        ("U", "Unknown"),
+    )
+    UNUSEDAVFAVGREASON_CHOICES = (
+        ("U", "Unknown"),
+        ("NC", "Not created"),
+        ("NR", "Not ready"),
+        ("AF", "Already failed"),
+    )
+    INSERTIONTECHNIQUE_CHOICES = (
+        ("U", "Unknown"),
+        ("OS", "Open surgery"),
+        ("L", "Laparoscopic"),
+        ("P", "Percutaneous"),
+    )
     modality = models.PositiveSmallIntegerField(
         choices=MOD_CHOICES,
         default=1,
@@ -557,7 +585,7 @@ class PatientKRTModality(models.Model):
     hd_unit = models.ForeignKey(
         "HDUnit",
         on_delete=models.SET_NULL,
-        verbose_name="HD unit",
+        verbose_name="If HD, state unit",
         blank=True,
         null=True,
     )
@@ -566,8 +594,12 @@ class PatientKRTModality(models.Model):
         default=0,
         verbose_name="If HD was the first KRT, what was the initial access?",
     )
-    hd_sessions = models.PositiveSmallIntegerField(blank=True, null=True)
-    hd_minssessions = models.PositiveSmallIntegerField(blank=True, null=True)
+    hd_sessions = models.PositiveSmallIntegerField(
+        blank=True, null=True, verbose_name="Sessions/week"
+    )
+    hd_minssessions = models.PositiveSmallIntegerField(
+        blank=True, null=True, verbose_name="Mins/session"
+    )
     hd_adequacy_urr = models.DecimalField(
         verbose_name="URR %",
         max_digits=4,
@@ -613,6 +645,51 @@ class PatientKRTModality(models.Model):
         blank=True,
         null=True,
     )
+    before_KRT = models.CharField(
+        max_length=13,
+        choices=BEFOREKRT_CHOICES,
+        default="UNK",
+        verbose_name="Which of the following has the patient seen in the year before starting KRT?",
+    )
+    ropdorprivnephr_days = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Time first seen by ROPD or private nephrologist in days before start of KRT:",
+    )
+    hepB_vac = models.CharField(
+        max_length=1,
+        choices=Y_N_CHOICES,
+        default="U",
+        verbose_name="Has the patient completed Hep B vaccination?",
+    )
+    delay_start = models.CharField(
+        max_length=1,
+        choices=Y_N_CHOICES,
+        default="U",
+        verbose_name="Did patient delay the start of dialysis despite nephrology advice?",
+    )
+    delay_beforedialysis = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Delay in full days in start of dialysis",
+    )
+    hd_unusedavfavgreason = models.CharField(
+        max_length=2,
+        choices=UNUSEDAVFAVGREASON_CHOICES,
+        default="U",
+        verbose_name="Why AVF/AVG not used to initiate HD?",
+    )
+    pd_catheterdays = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name="How early was the PD catheter inserted (whole days before first exchange)?",
+    )
+    pd_insertiontechnique = models.CharField(
+        max_length=2,
+        choices=INSERTIONTECHNIQUE_CHOICES,
+        default="U",
+        verbose_name="PD insertion technique:",
+    )
 
 
 class PatientAKImeasurement(models.Model):
@@ -626,6 +703,13 @@ class PatientAKImeasurement(models.Model):
     )
     egfr = models.DecimalField(
         verbose_name="Latest eGFR",
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+    hb = models.DecimalField(
+        verbose_name="Latest Hb",
         max_digits=5,
         decimal_places=2,
         blank=True,
@@ -750,7 +834,7 @@ class PatientAssessment(models.Model):
 
 
 class PatientLPAssessment(models.Model):
-    assessment = models.ForeignKey(
+    patientassessment = models.ForeignKey(
         "PatientAssessment",
         on_delete=models.CASCADE,
         blank=True,
@@ -775,7 +859,7 @@ class PatientLPAssessment(models.Model):
 
 
 class PatientMedicationAssessment(models.Model):
-    assessment = models.ForeignKey(
+    patientassessment = models.ForeignKey(
         "PatientAssessment",
         on_delete=models.CASCADE,
         blank=True,
@@ -791,3 +875,60 @@ class PatientMedicationAssessment(models.Model):
 
     class Meta:
         db_table = "renaldataregistry_patientassessment_med"
+
+
+class PatientStop(models.Model):
+    patient = models.OneToOneField(Patient, on_delete=models.CASCADE, primary_key=True)
+    ENDREASON_CHOICES = (
+        ("D", "Died"),
+        ("RKF", "Recovered kidney function"),
+        ("DR", "Doctor’s recommendation"),
+        ("LF", "Lost to follow-up"),
+        ("LM", "Left Mauritius"),
+        ("FC", "Patient or family choice"),
+    )
+    DEATHCAUSE_CHOICES = (
+        ("U", "Unknown"),
+        ("C", "Cardiovascular"),
+        ("CV", "Cerebrovascular"),
+        ("I", "Infection"),
+        ("M", "Malignancy"),
+        ("SD", "Stopped dialysis"),
+    )
+    last_dialysis_date = models.DateField(
+        verbose_name="Date of last dialysis",
+    )
+    stop_reason = models.CharField(
+        max_length=3,
+        choices=ENDREASON_CHOICES,
+        default="D",
+        verbose_name="Why AVF/AVG not used to initiate HD?",
+    )
+    dod = models.DateField(
+        verbose_name="Date of death",
+    )
+    cause_of_death = models.CharField(
+        max_length=2,
+        choices=DEATHCAUSE_CHOICES,
+        default="D",
+        verbose_name="Cause of death",
+    )
+    created_by = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        related_name="dod_created_by",
+        blank=True,
+        null=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_by = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        related_name="dod_updated_by",
+        blank=True,
+        null=True,
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "renaldataregistry_patientendoftreatment"

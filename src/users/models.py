@@ -11,13 +11,13 @@ class CustomUser(AbstractUser):
     for authentication instead of usernames.
     """
 
-    username = None
+    username = None  # type: ignore
     email = models.EmailField(_("email address"), unique=True)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS: list[str] = []
 
-    objects = CustomUserManager()
+    objects = CustomUserManager()  # type: ignore
 
     def __str__(self):
         return self.email

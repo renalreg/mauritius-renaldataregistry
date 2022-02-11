@@ -1,5 +1,3 @@
-import csv
-
 from django import forms
 from django.forms import ModelForm
 
@@ -11,11 +9,11 @@ class ValidationFormMixin(ModelForm):
         cleaned_data = super().clean()
 
         id_type = cleaned_data.get("id_type")
-        id = cleaned_data.get("id")
+        patient_id = cleaned_data.get("id")
 
         if id_type == 1:
-            if id is not None:
-                if len(id) < 14:
+            if patient_id is not None:
+                if len(patient_id) < 14:
                     errors.append("N.I.C. Id must be 14 characters.")
 
         if any(errors):
