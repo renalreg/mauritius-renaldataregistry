@@ -12,6 +12,7 @@ from renaldataregistry.models import (
     PatientContact,
     PatientRenalDiagnosis,
     PatientAKImeasurement,
+    PatientMeasurement,
 )
 from renaldataregistry.forms import (
     PatientRegistrationForm,
@@ -30,7 +31,12 @@ from renaldataregistry.forms import (
     PatientKRTModalityForm,
     CustomInlineFormSet,
     PatientContactForm,
+    CustomMeasurementInlineFormSet,
+    PatientMeasurementForm,
 )
+
+# pylint: disable=too-many-statements
+# pylint: disable=too-many-boolean-expressions
 
 # Create your views here.
 class PatientRegistrationListView(LoginRequiredMixin, ListView):
@@ -97,18 +103,34 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
             except PatientAddress.DoesNotExist:
                 patientaddress_form = PatientAddressForm()
 
-            patient_total_contacts = patient.patientcontact_set.count()
             # maxcontacts (6)
             patientcontact_iformset = inlineformset_factory(
                 Patient,
                 PatientContact,
                 form=PatientContactForm,
                 formset=CustomInlineFormSet,
-                extra=6 - patient_total_contacts,
+                extra=6 - patient.patientcontact_set.count(),
             )
             patientcontact_forms = patientcontact_iformset(instance=patient)
 
-            patientmeasurement_forms = PatientMeasurementFormSet(instance=patient)
+            # max measures (3)
+            existing_measures = patient.patientmeasurement_set.count()
+            patientmeasurement_iformset = inlineformset_factory(
+                Patient,
+                PatientMeasurement,
+                form=PatientMeasurementForm,
+                formset=CustomMeasurementInlineFormSet,
+                extra=3 - existing_measures,
+                can_delete=False,
+            )
+            patientmeasurement_forms = patientmeasurement_iformset(
+                instance=patient,
+                initial=[
+                    {"measurementtype": 1},
+                    {"measurementtype": 2},
+                    {"measurementtype": 3},
+                ],
+            )
             patientoccupation_forms = PatientOccupationFormSet(instance=patient)
 
             try:
@@ -133,7 +155,13 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
             patient_form = PatientForm()
             patientaddress_form = PatientAddressForm()
             patientcontact_forms = PatientContactFormSet()
-            patientmeasurement_forms = PatientMeasurementFormSet()
+            patientmeasurement_forms = PatientMeasurementFormSet(
+                initial=[
+                    {"measurementtype": 1},
+                    {"measurementtype": 2},
+                    {"measurementtype": 3},
+                ]
+            )
             patientoccupation_forms = PatientOccupationFormSet()
             patientrenaldiagnosis_form = PatientRenalDiagnosisForm()
             patientkrtmodality_forms = PatientKRTModalityFormSet()
@@ -159,6 +187,7 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
         except KeyError:
             patient_id = None
         if patient_id:
+            # existing patient
             patient = get_object_or_404(Patient, id=patient_id)
 
             patientregistration_form = PatientRegistrationForm(
@@ -171,7 +200,7 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
                     request.POST, instance=patient.patientaddress
                 )
             except PatientAddress.DoesNotExist:
-                patientaddress_form = PatientAddressForm()
+                patientaddress_form = PatientAddressForm(request.POST)
 
             patientcontact_forms = PatientContactFormSet(request.POST, instance=patient)
             patientmeasurement_forms = PatientMeasurementFormSet(
@@ -185,7 +214,8 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
                     request.POST, instance=patient.patientrenaldiagnosis
                 )
             except PatientRenalDiagnosis.DoesNotExist:
-                patientrenaldiagnosis_form = PatientRenalDiagnosisForm()
+                patientrenaldiagnosis_form = PatientRenalDiagnosisForm(request.POST)
+
             patientkrtmodality_forms = PatientKRTModalityFormSet(
                 request.POST, instance=patient
             )
@@ -194,11 +224,12 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
                     request.POST, instance=patient.patientakimeasurement
                 )
             except PatientAKImeasurement.DoesNotExist:
-                patientakimeasurement_form = PatientAKIMeasurementForm()
+                patientakimeasurement_form = PatientAKIMeasurementForm(request.POST)
             patientassessment_form = PatientAssessmentForm(
                 request.POST, instance=patient
             )
         else:
+            # new patient
             patientregistration_form = PatientRegistrationForm(request.POST)
             patient_form = PatientForm(request.POST)
             patientaddress_form = PatientAddressForm(request.POST)
@@ -213,29 +244,42 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
         if (
             patient_form.is_valid()
             and patientregistration_form.is_valid()
+            and patientaddress_form.is_valid()
             and patientcontact_forms.is_valid()
+            and patientmeasurement_forms.is_valid()
+            and patientakimeasurement_form.is_valid()
         ):
-            # to complete - save only on change
             patient = patient_form.save()
 
-            patientregistration = patientregistration_form.save(commit=False)
-            patientregistration.patient = patient
-            patientregistration.save()
+            if patientregistration_form.has_changed():
+                patientregistration = patientregistration_form.save(commit=False)
+                patientregistration.patient = patient
+                patientregistration.save()
+
+            if patientaddress_form.has_changed():
+                patientaddress = patientaddress_form.save(commit=False)
+                patientaddress.patient = patient
+                patientaddress.save()
 
             patientcontacts = patientcontact_forms.save(commit=False)
             for patientcontact in patientcontacts:
                 patientcontact.patient = patient
                 patientcontact.save()
 
+            patientmeasurements = patientmeasurement_forms.save(commit=False)
+            for patientmeasurement in patientmeasurements:
+                patientmeasurement.patient = patient
+                patientmeasurement.save()
+
             messages.success(
                 self.request,
-                "Completed",
+                "Completed.",
                 extra_tags="alert",
             )
             return redirect("renaldataregistry:PatientRegistrationListView")
         messages.error(
             self.request,
-            "The action was not completed. Please see below",
+            "The action was not completed, please see below.",
             extra_tags="alert",
         )
         context = {
@@ -310,29 +354,26 @@ class PatientRegistrationUpdateView(LoginRequiredMixin, UpdateView):
         return redirect("renaldataregistry:PatientRegistrationListView")
 
     def post(self, request, *args, **kwargs):
-        patientregistration_form = PatientRegistrationForm(request.POST)
-        if patientregistration_form.is_valid():
-            try:
-                patient_id = self.kwargs["patient_id"]
-            except KeyError:
-                patient_id = None
-            if patient_id:
-                patient = get_object_or_404(Patient, id=patient_id)
-
-            patientregistration = patientregistration_form.save(commit=False)
-            patientregistration.patient = patient
-            patientregistration.save(
-                update_fields=["health_institution", "unit", "updated_at"]
+        try:
+            patient_id = kwargs["patient_id"]
+        except KeyError:
+            patient_id = None
+        if patient_id:
+            patient = get_object_or_404(Patient, id=patient_id)
+            patientregistration_form = PatientRegistrationForm(
+                request.POST, instance=patient.patientregistration
             )
-            messages.success(
-                self.request,
-                "Completed - patient registration updated",
-                extra_tags="alert",
-            )
-            return redirect("renaldataregistry:PatientRegistrationListView")
+            if patientregistration_form.is_valid():
+                patientregistration_form.save()
+                messages.success(
+                    self.request,
+                    "Completed - patient main unit updated.",
+                    extra_tags="alert",
+                )
+                return redirect("renaldataregistry:PatientRegistrationListView")
         messages.error(
             self.request,
-            "Patient registration update failed - see below",
+            "The action was not completed, please see below.",
             extra_tags="alert",
         )
         context = {

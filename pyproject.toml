@@ -28,7 +28,8 @@ plugins = ["mypy_django_plugin.main"]
 ignore_missing_imports = true
 module = [
   "crispy_forms.*",
-  "bootstrap_datepicker_plus",
+  "bootstrap_datepicker_plus.*",
+  "simple_history.*",
 ]
 
 [tool.django-stubs]

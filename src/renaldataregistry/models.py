@@ -1,9 +1,6 @@
+from simple_history.models import HistoricalRecords
 from django.db import models
 from users.models import CustomUser
-
-# Create your models here.
-
-# Models for registration form
 
 
 class Patient(models.Model):
@@ -122,6 +119,7 @@ class PatientRegistration(models.Model):
         null=True,
     )
     updated_at = models.DateTimeField(auto_now=True)
+    history = HistoricalRecords()
 
 
 class HealthInstitution(models.Model):
@@ -460,16 +458,11 @@ class PatientRenalDiagnosis(models.Model):
 
 
 class PatientMeasurement(models.Model):
-    MEASURETYPE_CHOICES = (
-        (1, "Height (cm)"),
-        (2, "Weight (kg)"),
-        (3, "Birth weight (kg)"),
-    )
-    measurementtype = models.PositiveSmallIntegerField(
-        choices=MEASURETYPE_CHOICES,
-        default=1,
-        verbose_name="Measurement type",
-    )
+    # Measurement type
+    # 1, Height (cm)
+    # 2, Weight (kg)
+    # 3, Birth weight (kg)
+    measurementtype = models.PositiveSmallIntegerField(verbose_name="Measurement type")
     patient = models.ForeignKey(
         "Patient",
         on_delete=models.CASCADE,
@@ -695,14 +688,14 @@ class PatientKRTModality(models.Model):
 class PatientAKImeasurement(models.Model):
     patient = models.OneToOneField(Patient, on_delete=models.CASCADE, primary_key=True)
     creatinine = models.DecimalField(
-        verbose_name="Latest creatinine",
+        verbose_name="Latest creatinine (\u03BCmol/l)",
         max_digits=6,
         decimal_places=2,
         blank=True,
         null=True,
     )
     egfr = models.DecimalField(
-        verbose_name="Latest eGFR",
+        verbose_name="Latest eGFR (ml/min)",
         max_digits=5,
         decimal_places=2,
         blank=True,

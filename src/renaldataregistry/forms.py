@@ -1,7 +1,13 @@
 from django import forms
 from django.forms import BaseInlineFormSet, inlineformset_factory
 from bootstrap_datepicker_plus.widgets import DatePickerInput  # type: ignore
-from utils.mixin import ValidationFormMixin
+from utils.mixin import (
+    ValidationFormMixin,
+    PatientFormValidationMixin,
+    PatientAddressFormValidationMixin,
+    PatientMeasurementFormValidationMixin,
+    PatientAKIMeasurementFormValidationMixin,
+)
 from .models import (
     PatientRegistration,
     Patient,
@@ -57,7 +63,7 @@ class PatientRegistrationForm(ValidationFormMixin):
         fields = ["health_institution", "unit"]
 
 
-class PatientForm(ValidationFormMixin):
+class PatientForm(PatientFormValidationMixin):
     class Meta:
         model = Patient
         fields = [
@@ -76,7 +82,7 @@ class PatientForm(ValidationFormMixin):
         }
 
 
-class PatientAddressForm(ValidationFormMixin):
+class PatientAddressForm(PatientAddressFormValidationMixin):
     class Meta:
         model = PatientAddress
         fields = ["street", "postcode"]
@@ -97,10 +103,10 @@ PatientContactFormSet = inlineformset_factory(
 )
 
 
-class PatientMeasurementForm(ValidationFormMixin):
+class PatientMeasurementForm(PatientMeasurementFormValidationMixin):
     class Meta:
         model = PatientMeasurement
-        fields = ["measurementvalue"]
+        fields = ["measurementvalue", "measurementtype"]
 
 
 PatientMeasurementFormSet = inlineformset_factory(
@@ -109,6 +115,7 @@ PatientMeasurementFormSet = inlineformset_factory(
     form=PatientMeasurementForm,
     formset=CustomMeasurementInlineFormSet,
     extra=3,
+    can_delete=False,
 )
 
 
@@ -172,10 +179,13 @@ PatientKRTModalityFormSet = inlineformset_factory(
 )
 
 
-class PatientAKIMeasurementForm(ValidationFormMixin):
+class PatientAKIMeasurementForm(PatientAKIMeasurementFormValidationMixin):
     class Meta:
         model = PatientAKImeasurement
         fields = ["creatinine", "egfr", "hb", "measurement_date"]
+        widgets = {
+            "measurement_date": DatePickerInput(format="%d/%m/%Y"),
+        }
 
 
 class PatientAssessmentForm(ValidationFormMixin):

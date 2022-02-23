@@ -19,6 +19,32 @@
 </ul>
 {% endif %}
 
+{% if patientaddress_form.non_field_errors %}
+<ul>
+    {% for error in patientaddress_form.non_field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% for form in patientmeasurement_forms %}
+{% if form.non_field_errors %}
+<ul>
+    {% for error in form.non_field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endfor %}
+
+{% if patientakimeasurement_form.non_field_errors %}
+<ul>
+    {% for error in patientakimeasurement_form.non_field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
 <h1>Register patient</h1>
 <div class="container">
     <div class="row justify-content-center">
@@ -74,6 +100,8 @@
                     {% for form in patientmeasurement_forms %}
                     <div class="mb-3">
                         {{ form.measurementvalue | as_crispy_field}}
+                        {{ form.measurementtype.as_hidden }}
+                        {{ form.id.as_hidden }}
                     </div>
                     {% endfor %}
                     <div class="mb-3">
@@ -113,7 +141,7 @@
                     <div class="mb-3">
                         {{patientakimeasurement_form.measurement_date | as_crispy_field}}
                     </div>
-                    <p>Give chronology of previous and present KRT modalities</p>
+                    <p>Give chronology of previous KRT modalities</p>
                     {{ patientkrtmodality_forms.management_form }}
                     {% for form in patientkrtmodality_forms %}
                     {% if forloop.first %}
@@ -129,7 +157,7 @@
                         </div>
                     </div>
                     {% elif forloop.last %}
-                    <div class="p-3 mb-2 bg-info text-dark">
+                    <div class="p-3 mb-2 bg-info text-dark" id="current_krt_modality">
                         <legend>Present KRT modality</legend>
                         <div class="row g-2">
                             <div class="col-sm">
@@ -137,6 +165,9 @@
                             </div>
                             <div class="col-sm-6">
                                 {{form.start_date | as_crispy_field}}
+                            </div>
+                            <div class="col-sm-6">
+                                {{form.hd_unit | as_crispy_field}}
                             </div>
                         </div>
                     </div>

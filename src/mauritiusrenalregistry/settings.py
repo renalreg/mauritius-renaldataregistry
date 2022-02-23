@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap5",
     "bootstrap_datepicker_plus",
+    "simple_history",
     # Mauritius apps
     "users.apps.UsersConfig",
     "renaldataregistry.apps.RenaldataregistryConfig",
@@ -55,6 +56,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "simple_history.middleware.HistoryRequestMiddleware",
 ]
 
 ROOT_URLCONF = "mauritiusrenalregistry.urls"
