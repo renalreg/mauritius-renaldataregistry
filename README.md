@@ -37,6 +37,9 @@ To deploy the container:
 Example `.env` file structure:
 
 ```ini
+ALLOWED_HOSTS="renaldata1.exampledomain.com,renaldata2.exampledomain.com"
+DEBUG=0
+
 POSTGRES_DB=postgres
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
