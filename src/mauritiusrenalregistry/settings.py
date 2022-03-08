@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 import os
 import secrets
+from typing import List
 
 from django.contrib.messages import constants as messages
 
@@ -23,14 +24,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(int(os.environ.get('DEBUG', 0)))
+DEBUG = bool(int(os.environ.get("DEBUG", 0)))
 
 # Array of hosts that are allowed to access the site when debug mode is off
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS: List[str] = []
 ALLOWED_HOSTS.extend(
     filter(  # Remove empty strings
         None,
-        os.environ.get('ALLOWED_HOSTS', '').split(','),
+        os.environ.get("ALLOWED_HOSTS", "").split(","),
     )
 )
 
