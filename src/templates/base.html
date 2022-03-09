@@ -23,55 +23,53 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">Mauritius RenalDataRegistry</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse" id="navbarSupportedContent">
-                {% if user.is_authenticated %}
-                <div class="float-start">
-                    <ul class="navbar-nav">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                Patients
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="/renaldataregistry/patientregistration/list">List</a>
-                                </li>
-                                <li><a class="dropdown-item" href="/renaldataregistry/patient/register">Register</a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-                {% endif %}
-                <div class="float-end">
-                    <ul class="navbar-nav">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                                Options
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown2">
-                                {% if not user.is_authenticated %}
-                                <li><a class="dropdown-item" href="/users/login/">Login</a></li>
-                                {% endif %}
-                                {% if user.is_authenticated %}
-                                <a class="dropdown-item" href="/users/logout/">Logout</a>
-                                <a class="dropdown-item" href="/users/password_change/">Change Password</a>
-                                {% endif %}
-                                {% if user.is_superuser %}
-                                <a class="dropdown-item" href="/admin/">Admin</a>
-                                {% endif %}
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
+    <nav class="navbar navbar-expand-md navbar-dark bg-primary">
+        <div class="container">
+            <div class="mx-auto order-0">
+                <a class="navbar-brand mx-auto" href="/">Mauritius RenalDataRegistry</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".dual-collapse2">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+            {% if user.is_authenticated %}
+            <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Patients
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="/renaldataregistry/patientregistration/list">List</a>
+                            </li>
+                            <li><a class="dropdown-item" href="/renaldataregistry/patient/register">Register</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            {% endif %}
+            <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Options
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown2">
+                            {% if not user.is_authenticated %}
+                            <li><a class="dropdown-item" href="/users/login/">Login</a></li>
+                            {% endif %}
+                            {% if user.is_authenticated %}
+                            <a class="dropdown-item" href="/users/logout/">Logout</a>
+                            <a class="dropdown-item" href="/users/password_change/">Change Password</a>
+                            {% endif %}
+                            {% if user.is_superuser %}
+                            <a class="dropdown-item" href="/admin/">Admin</a>
+                            {% endif %}
+                        </ul>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>

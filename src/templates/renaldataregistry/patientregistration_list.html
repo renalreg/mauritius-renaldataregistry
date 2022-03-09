@@ -3,10 +3,9 @@
 {% load patient_list_extras %}
 
 {% block content %}
-{% if user.is_superuser %}
 <!-- Admin Users -->
-<h1>Patient registration list</h1>
 <div class="container">
+    <h1>Patient registration list</h1>
     <div class="row justify-content-center">
         <div class="col-10">
             <form action="{% url 'renaldataregistry:PatientRegistrationListView' %}" method="get">
@@ -27,33 +26,35 @@
                 </div>
             </div>
             {% endif %}
-            <table class='table table-hover'>
-                <tr>
-                    <th scope='col'>N.I.C or passport no.</th>
-                    <th scope='col'>Name</th>
-                    <th scope='col'>DOB</th>
-                    <th scope='col'>Gender</th>
-                    <th scope='col'>Health institution</th>
-                    <th scope='col'>Unit</th>
-                    <th colspan="2" scope="colgroup">Actions</th>
-                </tr>
-                {% for patientregistration in patientregistration_list %}
-                <tr>
-                    <td>{{patientregistration.patient.pid}}</td>
-                    <td>{{patientregistration.patient.name}} {{patientregistration.patient.surname}}</td>
-                    <td>{{patientregistration.patient.dob}}</td>
-                    <td>{{patientregistration.patient.get_gender_display}}</td>
-                    <td scope='row'>{{patientregistration.health_institution}}</td>
-                    <td scope='row'>{{patientregistration.unit}}</td>
-                    <td><a
-                            href="{% url 'renaldataregistry:PatientUpdateView' patientregistration.patient.id %}">Edit</a>
-                    </td>
-                    <td><a
-                            href="{% url 'renaldataregistry:PatientRegistrationUpdateView' patientregistration.patient.id %}">Move</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
+            <div class="table-responsive">
+                <table class='table table-hover'>
+                    <tr>
+                        <th scope='col'>N.I.C or passport no.</th>
+                        <th scope='col'>Name</th>
+                        <th scope='col'>DOB</th>
+                        <th scope='col'>Gender</th>
+                        <th scope='col'>Health institution</th>
+                        <th scope='col'>Unit</th>
+                        <th colspan="2" scope="colgroup">Actions</th>
+                    </tr>
+                    {% for patientregistration in patientregistration_list %}
+                    <tr>
+                        <td>{{patientregistration.patient.pid}}</td>
+                        <td>{{patientregistration.patient.name}} {{patientregistration.patient.surname}}</td>
+                        <td>{{patientregistration.patient.dob}}</td>
+                        <td>{{patientregistration.patient.get_gender_display}}</td>
+                        <td scope='row'>{{patientregistration.health_institution}}</td>
+                        <td scope='row'>{{patientregistration.unit}}</td>
+                        <td><a
+                                href="{% url 'renaldataregistry:PatientUpdateView' patientregistration.patient.id %}">Edit</a>
+                        </td>
+                        <td><a
+                                href="{% url 'renaldataregistry:PatientRegistrationUpdateView' patientregistration.patient.id %}">Move</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
             {% else %}
             <p>There are no records.</p>
             {% endif %}
@@ -94,5 +95,4 @@
         </div>
     </div>
 </div>
-{% endif %}
 {% endblock %}
