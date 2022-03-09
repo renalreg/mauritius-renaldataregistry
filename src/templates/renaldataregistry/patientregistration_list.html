@@ -35,7 +35,7 @@
                         <th scope='col'>Gender</th>
                         <th scope='col'>Health institution</th>
                         <th scope='col'>Unit</th>
-                        <th colspan="2" scope="colgroup">Actions</th>
+                        <th colspan="3" scope="colgroup">Actions</th>
                     </tr>
                     {% for patientregistration in patientregistration_list %}
                     <tr>
@@ -50,6 +50,9 @@
                         </td>
                         <td><a
                                 href="{% url 'renaldataregistry:PatientRegistrationUpdateView' patientregistration.patient.id %}">Move</a>
+                        </td>
+                        <td><a
+                                href="{% url 'renaldataregistry:PatientRegistrationHistoryView' patientregistration.patient.id %}">History</a>
                         </td>
                     </tr>
                     {% endfor %}

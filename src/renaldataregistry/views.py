@@ -1,6 +1,6 @@
 from django.forms import inlineformset_factory
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView, UpdateView
+from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.shortcuts import get_object_or_404, render
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -380,3 +380,19 @@ class PatientRegistrationUpdateView(LoginRequiredMixin, UpdateView):
             "patientregistration_form": patientregistration_form,
         }
         return render(request, "patientregistration_edit.html", context)
+
+
+class PatientRegistrationHistoryView(LoginRequiredMixin, DetailView):
+    def get(self, request, *args, **kwargs):
+        try:
+            patient_id = kwargs["patient_id"]
+        except KeyError:
+            patient_id = None
+
+        patientregistration = get_object_or_404(PatientRegistration, pk=patient_id)
+
+        return render(
+            request,
+            "patientregistration_history.html",
+            context={"patientregistration": patientregistration},
+        )
