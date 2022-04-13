@@ -13,7 +13,7 @@ echo "Creating default super user from environment variables"
 python src/manage.py createsuperuser --noinput
 
 # Collect static files
-python manage.py collectstatic --noinput
+python src/manage.py collectstatic --noinput
 
 # Start server
 echo "Starting server"
