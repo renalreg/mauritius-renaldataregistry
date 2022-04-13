@@ -36,6 +36,17 @@ The application will be running on port 8000, so set up your reverse proxy to re
 
 The docker-compose file is set up to also serve collected static files, so no downstream configuration is required for static files.
 
+### Updating deployed Docker image
+
+1. Update the repository on your server (e.g. `git pull`)
+2. Rebuild the Docker image with `docker-compose build`
+3. Restart the container with the updated image using `docker-compose down && docker-compose up -d`
+
+### Accessing logs
+
+1. Navigate to the application repository on your server
+2. `docker-compose logs` will show the logs of the container.
+
 #### Environment variables
 
 Example `.env` file structure:
