@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3.1"
 
 services:
   db:
@@ -8,19 +8,37 @@ services:
     env_file:
       - .env
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
 
   web:
-    image: ghcr.io/renalreg/mauritius-renaldataregistry:main
+    build: .
     environment:
       - POSTGRES_HOST=db
     env_file:
       - .env
-    ports:
-      - "8000:8000"
+    volumes:
+      - static_files:/src/static
     depends_on:
       db:
         condition: service_healthy
+
+  nginx:
+    image: nginx:1.19.6
+    volumes:
+      - ./nginx:/etc/nginx/templates
+      - static_files:/var/www/static
+    ports:
+      - 8000:9999
+    environment:
+      - APP_HOST=web
+      - APP_PORT=8000
+      - PORT=9999
+    depends_on:
+      - web
+    restart: always
+
+volumes:
+  static_files:
