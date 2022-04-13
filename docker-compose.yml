@@ -20,6 +20,8 @@ services:
     env_file:
       - .env
     volumes:
+      # We need to serve collected static files from our nginx container (below)
+      # so we mount the nginx container's static files volume here.
       - static_files:/src/static
     depends_on:
       db:
@@ -29,6 +31,8 @@ services:
     image: nginx:1.19.6
     volumes:
       - ./nginx:/etc/nginx/templates
+      # Use the collected static files from our 'web' container (above) as the
+      # source of static files for our nginx container.
       - static_files:/var/www/static
     ports:
       - 8000:9999
