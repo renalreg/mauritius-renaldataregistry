@@ -28,9 +28,13 @@ You can reference images by various tags:
 
 To deploy the container:
 
-1. Copy `docker-compose.yml` to the host machine
-2. Create a `.env` file populated as shown below
-3. Run `docker-compose up`
+1. Clone this repository to your server
+2. Create a populated `.env` file in the root of the repository
+3. Run `docker-compose up` (or `docker-compose up -d` to run in the background)
+
+The application will be running on port 8000, so set up your reverse proxy to redirect requests to that port.
+
+The docker-compose file is set up to also serve collected static files, so no downstream configuration is required for static files.
 
 #### Environment variables
 

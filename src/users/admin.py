@@ -1,3 +1,5 @@
+from typing import List
+
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth import get_user_model
@@ -65,7 +67,7 @@ class CustomUserAdmin(UserAdmin):
 class GroupAdminForm(forms.ModelForm):
     class Meta:
         model = Group
-        exclude: list[str] = []
+        exclude: List[str] = []
 
     User = get_user_model()
     users = forms.ModelMultipleChoiceField(
