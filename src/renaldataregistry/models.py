@@ -32,6 +32,10 @@ class Patient(models.Model):
         (3, "Unemployed"),
         (4, "Retired"),
     )
+    Y_N_CHOICES = (
+        ("Y", "Yes"),
+        ("N", "No"),
+    )
     pid = models.CharField(max_length=14, unique=True, verbose_name="Unique ID")
     id_type = models.PositiveSmallIntegerField(
         choices=TYPE_CHOICES,
@@ -71,6 +75,87 @@ class Patient(models.Model):
         blank=True,
         null=True,
     )
+    height = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name="Height (cm)",
+        blank=True,
+        null=True,
+    )
+    weight = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name="Weight (kg)",
+        blank=True,
+        null=True,
+    )
+    birth_weight = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name="Birth weight (kg)",
+        blank=True,
+        null=True,
+    )
+    street = models.CharField(
+        max_length=200, verbose_name="Street", null=True, blank=True
+    )
+    postcode = models.CharField(
+        max_length=5, verbose_name="Postcode", null=True, blank=True
+    )
+    current_occupation = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name="Current employment",
+    )
+    prev_occupation1 = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name="Significant previous occupation 1",
+    )
+    prev_occupation2 = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name="Significant previous occupation 2",
+    )
+    prev_occupation3 = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name="Significant previous occupation 3",
+    )
+    prev_occupation4 = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name="Significant previous occupation 4",
+    )
+    in_krt_modality = models.CharField(
+        max_length=1,
+        choices=Y_N_CHOICES,
+        default="N",
+        verbose_name="Is patient on Kidney Replacement Therapy (KRT)?",
+    )
+    landline_number1 = models.CharField(
+        max_length=7, null=True, blank=True, verbose_name="Home phone number"
+    )
+    landline_number2 = models.CharField(
+        max_length=7, null=True, blank=True, verbose_name="Alternative landline number"
+    )
+    mobile_number1 = models.CharField(
+        max_length=8, null=True, blank=True, verbose_name="Mobile phone number"
+    )
+    mobile_number2 = models.CharField(
+        max_length=8, null=True, blank=True, verbose_name="Alternative mobile number"
+    )
+    email = models.CharField(
+        max_length=100, blank=True, null=True, verbose_name="Email"
+    )
+    email2 = models.CharField(
+        max_length=100, blank=True, null=True, verbose_name="Alternative email"
+    )
     created_by = models.ForeignKey(
         CustomUser,
         on_delete=models.SET_NULL,
@@ -93,15 +178,13 @@ class PatientRegistration(models.Model):
     patient = models.OneToOneField(Patient, on_delete=models.CASCADE, primary_key=True)
     health_institution = models.ForeignKey(
         "HealthInstitution",
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         verbose_name="Health institution",
-        null=True,
     )
-    unit = models.ForeignKey(
+    unit = models.ManyToManyField(
         "Unit",
-        on_delete=models.SET_NULL,
+        blank=True,
         verbose_name="Unit",
-        null=True,
     )
     created_by = models.ForeignKey(
         CustomUser,
@@ -128,12 +211,21 @@ class HealthInstitution(models.Model):
         (1, "Public"),
         (2, "Private"),
     )
+    YN_CHOICES = (
+        ("Y", "Yes"),
+        ("N", "No"),
+    )
     code = models.CharField(max_length=5, unique=True)
     name = models.CharField(max_length=100)
     type = models.PositiveSmallIntegerField(
         choices=TYPE_CHOICES,
         default=0,
         verbose_name="Institution type",
+    )
+    is_unit_required = models.CharField(
+        max_length=1,
+        choices=YN_CHOICES,
+        default="N",
     )
     created_by = models.ForeignKey(
         CustomUser,
@@ -161,9 +253,7 @@ class Unit(models.Model):
     name = models.CharField(max_length=100)
     healthinstitution = models.ForeignKey(
         "HealthInstitution",
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
+        on_delete=models.CASCADE,
         verbose_name="Health institution",
     )
     created_by = models.ForeignKey(
@@ -184,7 +274,7 @@ class Unit(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return self.name + " (" + str(self.number) + ")"
 
 
 class HDUnit(models.Model):
@@ -343,161 +433,21 @@ class Medication(models.Model):
         return self.medication
 
 
-class PatientOccupation(models.Model):
-    patient = models.ForeignKey(
-        "Patient",
-        on_delete=models.CASCADE,
-        verbose_name="Patient",
-    )
-    occupation = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True,
-    )
-    is_current = models.BooleanField(default=False, null=False)
-    created_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="po_created_by",
-        blank=True,
-        null=True,
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="po_updated_by",
-        blank=True,
-        null=True,
-    )
-    updated_at = models.DateTimeField(auto_now=True)
-
-
-class PatientContact(models.Model):
-    # phone (P), mobile (M), email (E)
-    contactchannel = models.CharField(max_length=1)
-    patient = models.ForeignKey(
-        "Patient",
-        on_delete=models.CASCADE,
-        verbose_name="Patient",
-    )
-    contactvalue = models.CharField(max_length=100, blank=True, null=True)
-    created_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="pco_created_by",
-        blank=True,
-        null=True,
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="pco_updated_by",
-        blank=True,
-        null=True,
-    )
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["contactchannel", "patient", "created_at"],
-                name="unique_patient_contact",
-            )
-        ]
-
-
-class PatientAddress(models.Model):
-    patient = models.OneToOneField(Patient, on_delete=models.CASCADE, primary_key=True)
-    street = models.CharField(max_length=200, null=True, blank=True)
-    postcode = models.CharField(max_length=5, null=True, blank=True)
-    created_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="pa_created_by",
-        blank=True,
-        null=True,
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="pa_updated_by",
-        blank=True,
-        null=True,
-    )
-    updated_at = models.DateTimeField(auto_now=True)
-
-
 class PatientRenalDiagnosis(models.Model):
     patient = models.OneToOneField(Patient, on_delete=models.CASCADE, primary_key=True)
     renaldiagnosis = models.ForeignKey(
         "RenalDiagnosis",
         on_delete=models.SET_NULL,
+        verbose_name="ERA-EDTA CODE",
+        blank=True,
+        null=True,
+    )
+    description = models.CharField(
+        max_length=300,
+        blank=True,
+        null=True,
         verbose_name="Primary renal diagnosis",
-        blank=True,
-        null=True,
     )
-    created_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="prd_created_by",
-        blank=True,
-        null=True,
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="prd_updated_by",
-        blank=True,
-        null=True,
-    )
-    updated_at = models.DateTimeField(auto_now=True)
-
-
-class PatientMeasurement(models.Model):
-    # Measurement type
-    # 1, Height (cm)
-    # 2, Weight (kg)
-    # 3, Birth weight (kg)
-    measurementtype = models.PositiveSmallIntegerField(verbose_name="Measurement type")
-    patient = models.ForeignKey(
-        "Patient",
-        on_delete=models.CASCADE,
-        verbose_name="Patient",
-    )
-    measurementvalue = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        blank=True,
-        null=True,
-    )
-    created_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="pm_created_by",
-        blank=True,
-        null=True,
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="pm_updated_by",
-        blank=True,
-        null=True,
-    )
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["measurementtype", "patient", "created_at"],
-                name="unique_patient_measurement",
-            )
-        ]
 
 
 class PatientKRTModality(models.Model):
@@ -554,6 +504,10 @@ class PatientKRTModality(models.Model):
         ("L", "Laparoscopic"),
         ("P", "Percutaneous"),
     )
+    YN_CHOICES = (
+        ("Y", "Yes"),
+        ("N", "No"),
+    )
     modality = models.PositiveSmallIntegerField(
         choices=MOD_CHOICES,
         default=1,
@@ -564,10 +518,11 @@ class PatientKRTModality(models.Model):
         blank=True,
         null=True,
     )
-    is_current = models.BooleanField(
-        default=False,
+    is_current = models.CharField(
+        max_length=1,
+        choices=YN_CHOICES,
+        default="N",
         blank=True,
-        null=True,
     )
     start_date = models.DateField(
         verbose_name="Date started",
@@ -585,6 +540,7 @@ class PatientKRTModality(models.Model):
     hd_initialaccess = models.PositiveSmallIntegerField(
         choices=INITIALACCESS_CHOICES,
         default=0,
+        blank=True,
         verbose_name="If HD was the first KRT, what was the initial access?",
     )
     hd_sessions = models.PositiveSmallIntegerField(
@@ -610,6 +566,7 @@ class PatientKRTModality(models.Model):
     hd_ntcreason = models.PositiveSmallIntegerField(
         choices=NTCREASON_CHOICES,
         default=0,
+        blank=True,
         verbose_name="If on NTC, why?",
     )
     # if patient in PD:
@@ -641,7 +598,8 @@ class PatientKRTModality(models.Model):
     before_KRT = models.CharField(
         max_length=13,
         choices=BEFOREKRT_CHOICES,
-        default="UNK",
+        default="U",
+        blank=True,
         verbose_name="Which of the following has the patient seen in the year before starting KRT?",
     )
     ropdorprivnephr_days = models.IntegerField(
@@ -653,12 +611,14 @@ class PatientKRTModality(models.Model):
         max_length=1,
         choices=Y_N_CHOICES,
         default="U",
+        blank=True,
         verbose_name="Has the patient completed Hep B vaccination?",
     )
     delay_start = models.CharField(
         max_length=1,
         choices=Y_N_CHOICES,
         default="U",
+        blank=True,
         verbose_name="Did patient delay the start of dialysis despite nephrology advice?",
     )
     delay_beforedialysis = models.IntegerField(
@@ -670,6 +630,7 @@ class PatientKRTModality(models.Model):
         max_length=2,
         choices=UNUSEDAVFAVGREASON_CHOICES,
         default="U",
+        blank=True,
         verbose_name="Why AVF/AVG not used to initiate HD?",
     )
     pd_catheterdays = models.IntegerField(
@@ -681,6 +642,7 @@ class PatientKRTModality(models.Model):
         max_length=2,
         choices=INSERTIONTECHNIQUE_CHOICES,
         default="U",
+        blank=True,
         verbose_name="PD insertion technique:",
     )
 
@@ -713,22 +675,6 @@ class PatientAKImeasurement(models.Model):
         blank=True,
         null=True,
     )
-    created_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="paki_created_by",
-        blank=True,
-        null=True,
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="paki_updated_by",
-        blank=True,
-        null=True,
-    )
-    updated_at = models.DateTimeField(auto_now=True)
 
 
 class PatientAssessment(models.Model):

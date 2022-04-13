@@ -19,23 +19,13 @@
 </ul>
 {% endif %}
 
-{% if patientaddress_form.non_field_errors %}
+{% if patientregistration_form.non_field_errors %}
 <ul>
-    {% for error in patientaddress_form.non_field_errors %}
+    {% for error in patientregistration_form.non_field_errors %}
     <li>{{ error }}</li>
     {% endfor %}
 </ul>
 {% endif %}
-
-{% for form in patientmeasurement_forms %}
-{% if form.non_field_errors %}
-<ul>
-    {% for error in form.non_field_errors %}
-    <li>{{ error }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-{% endfor %}
 
 {% if patientakimeasurement_form.non_field_errors %}
 <ul>
@@ -49,7 +39,8 @@
     <h1>Register patient</h1>
     <div class="row justify-content-center">
         <div class="col-5">
-            <form class="" id="mrr_form" action="" method="post">
+            <form class="" id="mrr_form" action="" method="post"
+                data-units-url="{% url 'renaldataregistry:load-units' %}">
                 {% csrf_token %}
                 <div class="tab">
                     <div class="mb-3">
@@ -80,30 +71,43 @@
                         {{patient_form.gender | as_crispy_field}}
                     </div>
                     <div class="mb-3">
-                        {{patientaddress_form.postcode | as_crispy_field}}
+                        {{patient_form.postcode | as_crispy_field}}
                     </div>
                     <div class="mb-3">
-                        {{patientaddress_form.street | as_crispy_field}}
+                        {{patient_form.street | as_crispy_field}}
                     </div>
-                    {{ patientcontact_forms.management_form }}
-                    {% for form in patientcontact_forms %}
                     <div class="mb-3">
-                        {{ form.contactvalue | as_crispy_field}}
+                        {{patient_form.landline_number1 | as_crispy_field}}
                     </div>
-                    {% endfor %}
+                    <div class="mb-3">
+                        {{patient_form.landline_number2 | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patient_form.mobile_number1 | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patient_form.mobile_number2 | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patient_form.email | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patient_form.email2 | as_crispy_field}}
+                    </div>
                 </div>
                 <div class="tab">
                     <div class="mb-3">
                         <h2>Other details:</h2>
                     </div>
-                    {{ patientmeasurement_forms.management_form }}
-                    {% for form in patientmeasurement_forms %}
                     <div class="mb-3">
-                        {{ form.measurementvalue | as_crispy_field}}
-                        {{ form.measurementtype.as_hidden }}
-                        {{ form.id.as_hidden }}
+                        {{patient_form.height | as_crispy_field}}
                     </div>
-                    {% endfor %}
+                    <div class="mb-3">
+                        {{patient_form.weight | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patient_form.birth_weight | as_crispy_field}}
+                    </div>
                     <div class="mb-3">
                         {{patient_form.ethnic | as_crispy_field}}
                     </div>
@@ -113,25 +117,35 @@
                     <div class="mb-3">
                         {{patient_form.occupationalstatus | as_crispy_field}}
                     </div>
-                    {{ patientoccupation_forms.management_form }}
-                    {% for form in patientoccupation_forms %}
                     <div class="mb-3">
-                        {{ form.occupation | as_crispy_field}}
+                        {{patient_form.current_occupation | as_crispy_field}}
                     </div>
-                    {% endfor %}
+                    <div class="mb-3">
+                        {{patient_form.prev_occupation1 | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patient_form.prev_occupation2 | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patient_form.prev_occupation3 | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patient_form.prev_occupation4 | as_crispy_field}}
+                    </div>
                 </div>
                 <div class="tab">
                     <div class="mb-3">
                         <h2>Primary renal diagnosis and KRT modality:</h2>
                     </div>
                     <div class="mb-3">
+                        {{patientrenaldiagnosis_form.description | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
                         {{patientrenaldiagnosis_form.renaldiagnosis | as_crispy_field}}
                     </div>
-                    <p>Is patient on Kidney Replacement Therapy (KRT)?</p>
-                    <select name="krt_status" id="id_krt_status">
-                        <option value=1>Yes</option>
-                        <option value=0>No</option>
-                    </Select>
+                    <div class="mb-3">
+                        {{patient_form.in_krt_modality | as_crispy_field}}
+                    </div>
                     <div class="mb-3">
                         {{patientakimeasurement_form.creatinine | as_crispy_field}}
                     </div>
@@ -139,20 +153,24 @@
                         {{patientakimeasurement_form.egfr | as_crispy_field}}
                     </div>
                     <div class="mb-3">
+                        {{patientakimeasurement_form.hb | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
                         {{patientakimeasurement_form.measurement_date | as_crispy_field}}
                     </div>
                     <p>Give chronology of previous KRT modalities</p>
                     {{ patientkrtmodality_forms.management_form }}
                     {% for form in patientkrtmodality_forms %}
+                    {{ form.id.as_hidden }}
                     {% if forloop.first %}
                     <div class="p-3 mb-2 bg-info text-dark">
                         <legend>First KRT modality</legend>
                         <div class="row g-2">
                             <div class="col-sm">
-                                {{form.modality | as_crispy_field}}
+                                {{ form.modality | as_crispy_field}}
                             </div>
                             <div class="col-sm-6">
-                                {{form.start_date | as_crispy_field}}
+                                {{ form.start_date | as_crispy_field}}
                             </div>
                         </div>
                     </div>
@@ -161,23 +179,23 @@
                         <legend>Present KRT modality</legend>
                         <div class="row g-2">
                             <div class="col-sm">
-                                {{form.modality | as_crispy_field}}
+                                {{ form.modality | as_crispy_field}}
                             </div>
                             <div class="col-sm-6">
-                                {{form.start_date | as_crispy_field}}
+                                {{ form.start_date | as_crispy_field}}
                             </div>
                             <div class="col-sm-6">
-                                {{form.hd_unit | as_crispy_field}}
+                                {{ form.hd_unit | as_crispy_field}}
                             </div>
                         </div>
                     </div>
                     {%else%}
                     <div class="row g-2">
                         <div class="col-sm">
-                            {{form.modality | as_crispy_field}}
+                            {{ form.modality | as_crispy_field}}
                         </div>
                         <div class="col-sm-6">
-                            {{form.start_date | as_crispy_field}}
+                            {{ form.start_date | as_crispy_field}}
                         </div>
                     </div>
                     {% endif %}

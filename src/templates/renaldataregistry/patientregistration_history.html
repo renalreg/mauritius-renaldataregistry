@@ -14,13 +14,11 @@
                     <tr>
                         <th scope='col'>Updated at</th>
                         <th scope='col'>Health institution</th>
-                        <th scope='col'>Unit</th>
                     </tr>
                     {% for pr in patientregistration.history.all %}
                     <tr>
                         <td>{{pr.history_date}}</td>
                         <td>{{pr.health_institution}}</td>
-                        <td>{{pr.unit}}</td>
                     </tr>
                     {% endfor %}
                 </table>

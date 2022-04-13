@@ -1,20 +1,19 @@
 from django import forms
-from django.forms import BaseInlineFormSet, inlineformset_factory
+from django.forms import (
+    inlineformset_factory,
+    ModelForm,
+    Textarea,
+)
 from bootstrap_datepicker_plus.widgets import DatePickerInput  # type: ignore
 from utils.mixin import (
-    ValidationFormMixin,
     PatientFormValidationMixin,
-    PatientAddressFormValidationMixin,
-    PatientMeasurementFormValidationMixin,
     PatientAKIMeasurementFormValidationMixin,
+    PatientRegistrationFormValidationMixin,
 )
 from .models import (
+    Unit,
     PatientRegistration,
     Patient,
-    PatientAddress,
-    PatientContact,
-    PatientMeasurement,
-    PatientOccupation,
     PatientRenalDiagnosis,
     PatientKRTModality,
     PatientAKImeasurement,
@@ -25,42 +24,29 @@ from .models import (
 )
 
 
-class CustomInlineFormSet(BaseInlineFormSet):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # no_of_forms = len(self)
-        self[0].fields["contactvalue"].label = "Phone No."  # phone
-        self[1].fields["contactvalue"].label = "Mobile phone No."  # mobile
-        self[2].fields["contactvalue"].label = "Other phone No."  # alt_phone1
-        self[3].fields["contactvalue"].label = "Other phone No."  # alt_phone2
-        self[4].fields["contactvalue"].label = "Email"  # email
-        self[5].fields["contactvalue"].label = "Alternative email"  # alt_email
-        # for i in range(0, no_of_forms):
-        #     self[i].fields['contactvalue'].label += "-%d" % (i + 1)
-
-
-class CustomMeasurementInlineFormSet(BaseInlineFormSet):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self[0].fields["measurementvalue"].label = "Height (cm)"
-        self[1].fields["measurementvalue"].label = "Weight (kg)"
-        self[2].fields["measurementvalue"].label = "Birth weight (kg)"
-
-
-class CustomOccupationInlineFormSet(BaseInlineFormSet):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self[0].fields["occupation"].label = "Current employment"
-        self[1].fields["occupation"].label = "Significant previous occupation 1"
-        self[2].fields["occupation"].label = "Significant previous occupation 2"
-        self[3].fields["occupation"].label = "Significant previous occupation 3"
-        self[4].fields["occupation"].label = "Significant previous occupation 4"
-
-
-class PatientRegistrationForm(ValidationFormMixin):
+class PatientRegistrationForm(PatientRegistrationFormValidationMixin):
     class Meta:
         model = PatientRegistration
         fields = ["health_institution", "unit"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["unit"].queryset = Unit.objects.none()
+
+        if "health_institution" in self.data:
+            # post data
+            try:
+                hi_id = int(self.data.get("health_institution"))
+                self.fields["unit"].queryset = Unit.objects.filter(
+                    healthinstitution=hi_id
+                ).order_by("name")
+            except (ValueError, TypeError):
+                pass
+        elif self.instance.pk:
+            # Get units from linked to the registered hi
+            self.fields[
+                "unit"
+            ].queryset = self.instance.health_institution.unit_set.order_by("name")
 
 
 class PatientForm(PatientFormValidationMixin):
@@ -76,75 +62,44 @@ class PatientForm(PatientFormValidationMixin):
             "gender",
             "maritalstatus",
             "occupationalstatus",
+            "height",
+            "weight",
+            "birth_weight",
+            "street",
+            "postcode",
+            "current_occupation",
+            "prev_occupation1",
+            "prev_occupation2",
+            "prev_occupation3",
+            "prev_occupation4",
+            "in_krt_modality",
+            "landline_number1",
+            "landline_number2",
+            "mobile_number1",
+            "mobile_number2",
+            "email",
+            "email2",
         ]
         widgets = {
             "dob": DatePickerInput(format="%d/%m/%Y"),
         }
 
 
-class PatientAddressForm(PatientAddressFormValidationMixin):
-    class Meta:
-        model = PatientAddress
-        fields = ["street", "postcode"]
-
-
-class PatientContactForm(ValidationFormMixin):
-    class Meta:
-        model = PatientContact
-        fields = ["contactvalue"]
-
-
-PatientContactFormSet = inlineformset_factory(
-    Patient,
-    PatientContact,
-    form=PatientContactForm,
-    formset=CustomInlineFormSet,
-    extra=6,
-)
-
-
-class PatientMeasurementForm(PatientMeasurementFormValidationMixin):
-    class Meta:
-        model = PatientMeasurement
-        fields = ["measurementvalue", "measurementtype"]
-
-
-PatientMeasurementFormSet = inlineformset_factory(
-    Patient,
-    PatientMeasurement,
-    form=PatientMeasurementForm,
-    formset=CustomMeasurementInlineFormSet,
-    extra=3,
-    can_delete=False,
-)
-
-
-class PatientOccupationForm(ValidationFormMixin):
-    class Meta:
-        model = PatientOccupation
-        fields = ["occupation"]
-
-
-PatientOccupationFormSet = inlineformset_factory(
-    Patient,
-    PatientOccupation,
-    form=PatientOccupationForm,
-    formset=CustomOccupationInlineFormSet,
-    extra=5,
-)
-
-
-class PatientRenalDiagnosisForm(ValidationFormMixin):
+class PatientRenalDiagnosisForm(ModelForm):
     class Meta:
         model = PatientRenalDiagnosis
-        fields = ["renaldiagnosis"]
+        fields = ["description", "renaldiagnosis"]
+        widgets = {
+            "description": Textarea(attrs={"cols": 20, "rows": 5}),
+        }
 
 
-class PatientKRTModalityForm(ValidationFormMixin):
+class PatientKRTModalityForm(ModelForm):
     class Meta:
         model = PatientKRTModality
         fields = [
             "modality",
+            "is_current",
             "start_date",
             "hd_unit",
             "hd_initialaccess",
@@ -176,6 +131,7 @@ PatientKRTModalityFormSet = inlineformset_factory(
     PatientKRTModality,
     form=PatientKRTModalityForm,
     extra=6,
+    can_delete=False,
 )
 
 
@@ -188,7 +144,7 @@ class PatientAKIMeasurementForm(PatientAKIMeasurementFormValidationMixin):
         }
 
 
-class PatientAssessmentForm(ValidationFormMixin):
+class PatientAssessmentForm(ModelForm):
     class Meta:
         model = PatientAssessment
         fields = [
@@ -201,6 +157,10 @@ class PatientAssessmentForm(ValidationFormMixin):
             "hiv",
             "posthd_weight",
         ]
+        widgets = {
+            "comorbidity": forms.CheckboxSelectMultiple,
+            "disability": forms.CheckboxSelectMultiple,
+        }
 
 
 class PatientAssessmentLPForm(forms.Form):
@@ -236,7 +196,7 @@ class PatientAssessmentMedicationForm(forms.Form):
                 )
 
 
-class PatientStopForm(ValidationFormMixin):
+class PatientStopForm(ModelForm):
     class Meta:
         model = PatientStop
         fields = ["last_dialysis_date", "stop_reason", "dod", "cause_of_death"]

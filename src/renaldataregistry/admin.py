@@ -10,6 +10,8 @@ from .models import (
     Disability,
     LaboratoryParameter,
     Medication,
+    HealthInstitution,
+    Unit,
 )
 
 
@@ -18,4 +20,6 @@ admin.site.register(RenalDiagnosis)
 admin.site.register(Disability)
 admin.site.register(LaboratoryParameter)
 admin.site.register(Medication)
+admin.site.register(HealthInstitution)
+admin.site.register(Unit)
 admin.site.register(PatientRegistration, SimpleHistoryAdmin)

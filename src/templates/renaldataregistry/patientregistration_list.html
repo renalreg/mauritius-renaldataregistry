@@ -43,8 +43,17 @@
                         <td>{{patientregistration.patient.name}} {{patientregistration.patient.surname}}</td>
                         <td>{{patientregistration.patient.dob}}</td>
                         <td>{{patientregistration.patient.get_gender_display}}</td>
-                        <td scope='row'>{{patientregistration.health_institution}}</td>
-                        <td scope='row'>{{patientregistration.unit}}</td>
+                        <td>{{patientregistration.health_institution}}</td>
+                        {% if patientregistration.unit.count > 1 %}
+                        <td>
+                            {% for unit in patientregistration.unit.all %}
+                            {{unit}}
+                            <br />
+                            {% endfor %}
+                        </td>
+                        {% else %}
+                        <td>{{patientregistration.unit.first}}</td>
+                        {% endif %}
                         <td><a
                                 href="{% url 'renaldataregistry:PatientUpdateView' patientregistration.patient.id %}">Edit</a>
                         </td>

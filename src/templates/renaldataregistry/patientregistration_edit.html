@@ -22,20 +22,29 @@
     <div class="row justify-content-center">
         <div class="col">
             <div class="mb-3">
-                <h2>Current location:</h2>
+                <p>Current location:</p>
             </div>
             <div class="mb-3">
                 Health institution: {{ patient.patientregistration.health_institution }}
             </div>
             <div class="mb-3">
-                Unit: {{ patient.patientregistration.unit }}
+                {% if patient.patientregistration.unit.count > 1 %}
+                Units:
+                <br />
+                {% for unit in patient.patientregistration.unit.all %}
+                {{unit}}
+                <br />
+                {% endfor %}
+                {% else %}
+                Unit: {{ patient.patientregistration.unit.first }}
+                {% endif %}
             </div>
         </div>
         <div class="col">
             <form class="" action="" method="post">
                 {% csrf_token %}
                 <div class="mb-3">
-                    <h2>New location:</h2>
+                    <p>New location:</p>
                 </div>
                 <div class="mb-3">
                     {{patientregistration_form.health_institution | as_crispy_field}}
