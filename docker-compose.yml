@@ -22,7 +22,7 @@ services:
     volumes:
       # We need to serve collected static files from our nginx container (below)
       # so we mount the nginx container's static files volume here.
-      - static_files:/src/static
+      - static_files:/app/src/static
     depends_on:
       db:
         condition: service_healthy
