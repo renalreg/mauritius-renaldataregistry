@@ -36,14 +36,18 @@ class Patient(models.Model):
         ("Y", "Yes"),
         ("N", "No"),
     )
-    pid = models.CharField(max_length=14, unique=True, verbose_name="Unique ID")
+    pid = models.CharField(
+        max_length=14,
+        unique=True,
+        verbose_name="N.I.C no. (or passport no. for foreigners)",
+    )
     id_type = models.PositiveSmallIntegerField(
         choices=TYPE_CHOICES,
         default=1,
         verbose_name="Unique identifier type",
     )
-    name = models.CharField(max_length=100)
-    surname = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, verbose_name="Other Name/s")
+    surname = models.CharField(max_length=100, verbose_name="Surname")
     dob = models.DateField(
         verbose_name="Date of birth",
     )
@@ -71,7 +75,7 @@ class Patient(models.Model):
     occupationalstatus = models.PositiveSmallIntegerField(
         choices=OCCUPATIONALSTATUS_CHOICES,
         default=1,
-        verbose_name="Occupational status",
+        verbose_name="Occupation",
         blank=True,
         null=True,
     )
@@ -713,12 +717,12 @@ class PatientAssessment(models.Model):
         verbose_name="Patient",
     )
     comorbidity = models.ManyToManyField(
-        Comorbidity,
+        "Comorbidity",
         blank=True,
         verbose_name="Comorbidities",
     )
     disability = models.ManyToManyField(
-        Disability,
+        "Disability",
         blank=True,
         verbose_name="Disabilities",
     )

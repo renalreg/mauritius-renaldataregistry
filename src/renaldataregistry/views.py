@@ -38,6 +38,11 @@ def load_units(request):
     return render(request, "unit_dropdownlist_options.html", {"units": units})
 
 
+class PatientView(LoginRequiredMixin, DetailView):
+    model = Patient
+    template_name = "patient_view.html"
+
+
 class PatientRegistrationListView(LoginRequiredMixin, ListView):
     paginate_by = 15
     model = PatientRegistration
@@ -93,6 +98,7 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
             patient_id = None
 
         if patient_id:
+            title = "Edit patient"
             patient = get_object_or_404(Patient, id=patient_id)
             context["patient"] = patient
             patient_form = PatientForm(instance=patient)
@@ -127,6 +133,7 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
             patient_assessement = PatientAssessment.objects.get(patient=patient)
             patientassessment_form = PatientAssessmentForm(instance=patient_assessement)
         else:
+            title = "Register patient"
             patientregistration_form = PatientRegistrationForm()
             patient_form = PatientForm()
             patientrenaldiagnosis_form = PatientRenalDiagnosisForm()
@@ -140,6 +147,7 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
             "patientkrtmodality_forms": patientkrtmodality_forms,
             "patientakimeasurement_form": patientakimeasurement_form,
             "patientassessment_form": patientassessment_form,
+            "view_title": title,
         }
         return render(request, template_name, context)
 
@@ -282,56 +290,6 @@ class PatientStopView(LoginRequiredMixin, CreateView):
             "patientstop_form": patientstop_form,
         }
         return render(request, "patient_stop.html", context)
-
-
-class PatientRegistrationUpdateView(LoginRequiredMixin, UpdateView):
-    def get(self, request, *args, **kwargs):
-        try:
-            patient_id = kwargs["patient_id"]
-        except KeyError:
-            patient_id = None
-        if patient_id:
-            patient = get_object_or_404(Patient, id=patient_id)
-            try:
-                patientregistration_form = PatientRegistrationForm(
-                    instance=patient.patientregistration
-                )
-            except PatientRegistration.DoesNotExist:
-                patientregistration_form = PatientRegistrationForm()
-            context = {
-                "patient": patient,
-                "patientregistration_form": patientregistration_form,
-            }
-            return render(request, "patientregistration_edit.html", context)
-        return redirect("renaldataregistry:PatientRegistrationListView")
-
-    def post(self, request, *args, **kwargs):
-        try:
-            patient_id = kwargs["patient_id"]
-        except KeyError:
-            patient_id = None
-        if patient_id:
-            patient = get_object_or_404(Patient, id=patient_id)
-            patientregistration_form = PatientRegistrationForm(
-                request.POST, instance=patient.patientregistration
-            )
-            if patientregistration_form.is_valid():
-                patientregistration_form.save()
-                messages.success(
-                    self.request,
-                    "Completed - patient main unit updated.",
-                    extra_tags="alert",
-                )
-                return redirect("renaldataregistry:PatientRegistrationListView")
-        messages.error(
-            self.request,
-            "The action was not completed, please see below.",
-            extra_tags="alert",
-        )
-        context = {
-            "patientregistration_form": patientregistration_form,
-        }
-        return render(request, "patientregistration_edit.html", context)
 
 
 class PatientRegistrationHistoryView(LoginRequiredMixin, DetailView):
