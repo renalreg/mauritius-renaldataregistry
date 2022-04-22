@@ -1,6 +1,5 @@
 from django import forms
 from django.forms import (
-    inlineformset_factory,
     ModelForm,
     Textarea,
 )
@@ -9,6 +8,7 @@ from utils.mixin import (
     PatientFormValidationMixin,
     PatientAKIMeasurementFormValidationMixin,
     PatientRegistrationFormValidationMixin,
+    PatientKRTModalityFormValidationMixin,
 )
 from .models import (
     Unit,
@@ -94,11 +94,12 @@ class PatientRenalDiagnosisForm(ModelForm):
         }
 
 
-class PatientKRTModalityForm(ModelForm):
+class PatientKRTModalityForm(PatientKRTModalityFormValidationMixin):
     class Meta:
         model = PatientKRTModality
         fields = [
             "modality",
+            "is_first",
             "is_current",
             "start_date",
             "hd_unit",
@@ -124,15 +125,6 @@ class PatientKRTModalityForm(ModelForm):
         widgets = {
             "start_date": DatePickerInput(format="%d/%m/%Y"),
         }
-
-
-PatientKRTModalityFormSet = inlineformset_factory(
-    Patient,
-    PatientKRTModality,
-    form=PatientKRTModalityForm,
-    extra=6,
-    can_delete=False,
-)
 
 
 class PatientAKIMeasurementForm(PatientAKIMeasurementFormValidationMixin):

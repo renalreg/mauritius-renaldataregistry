@@ -215,10 +215,6 @@ class HealthInstitution(models.Model):
         (1, "Public"),
         (2, "Private"),
     )
-    YN_CHOICES = (
-        ("Y", "Yes"),
-        ("N", "No"),
-    )
     code = models.CharField(max_length=5, unique=True)
     name = models.CharField(max_length=100)
     type = models.PositiveSmallIntegerField(
@@ -226,10 +222,10 @@ class HealthInstitution(models.Model):
         default=0,
         verbose_name="Institution type",
     )
-    is_unit_required = models.CharField(
-        max_length=1,
-        choices=YN_CHOICES,
-        default="N",
+    is_unit_required = models.BooleanField(
+        default=False,
+        blank=True,
+        null=True,
     )
     created_by = models.ForeignKey(
         CustomUser,
@@ -508,10 +504,6 @@ class PatientKRTModality(models.Model):
         ("L", "Laparoscopic"),
         ("P", "Percutaneous"),
     )
-    YN_CHOICES = (
-        ("Y", "Yes"),
-        ("N", "No"),
-    )
     modality = models.PositiveSmallIntegerField(
         choices=MOD_CHOICES,
         default=1,
@@ -522,11 +514,10 @@ class PatientKRTModality(models.Model):
         blank=True,
         null=True,
     )
-    is_current = models.CharField(
-        max_length=1,
-        choices=YN_CHOICES,
-        default="N",
+    is_current = models.BooleanField(
+        default=False,
         blank=True,
+        null=True,
     )
     start_date = models.DateField(
         verbose_name="Date started",

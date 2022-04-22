@@ -47,3 +47,10 @@ select.invalid {
   .step.finish {
     background-color: #04AA6D;
   }
+
+  .redBorder {
+    border: 1px solid #f03333
+  }
+  .grayText {
+    color: gray;
+  }
