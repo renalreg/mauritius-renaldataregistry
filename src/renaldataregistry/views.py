@@ -1,4 +1,3 @@
-from django.forms import inlineformset_factory
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.shortcuts import get_object_or_404, render
@@ -23,12 +22,10 @@ from renaldataregistry.forms import (
     PatientAssessmentLPForm,
     PatientAssessmentMedicationForm,
     PatientStopForm,
-    PatientKRTModalityFormSet,
     PatientKRTModalityForm,
 )
 
-# pylint: disable=too-many-statements
-# pylint: disable=too-many-boolean-expressions
+# pylint: disable=too-many-statements, too-many-boolean-expressions, too-many-branches
 
 # Create your views here.
 def load_units(request):
@@ -89,9 +86,40 @@ class PatientRegistrationListView(LoginRequiredMixin, ListView):
 
 
 class PatientRegistrationView(LoginRequiredMixin, UpdateView):
+    def __init__(self):
+        self.all_patient_krt_modalities = [None] * 6
+
+    def get_krt_modalities(self, patient):
+        """
+        Get the 6 oldest KRT modalities
+        """
+        left_krt_modalities_list = []
+        i = 4
+        # Loading chronology of KRT modalities (the 6 oldest ones) and sorting them in the relevant order for the patient registration form
+        patient_krtmodalities = PatientKRTModality.objects.filter(
+            patient=patient
+        ).order_by("start_date")[:6]
+        # Rearranging krt modalities to meet chronology in patient registration form
+        for _, patientkrtmodality in enumerate(patient_krtmodalities):
+            if patientkrtmodality.is_first and not patientkrtmodality.is_current:
+                # setting first modality
+                self.all_patient_krt_modalities[0] = patientkrtmodality
+            else:
+                if patientkrtmodality.is_current:
+                    # setting current modality
+                    self.all_patient_krt_modalities[5] = patientkrtmodality
+                else:
+                    # rest of the krt modalities
+                    left_krt_modalities_list.append(patientkrtmodality)
+        while left_krt_modalities_list:
+            # merge rest of the krt modalities in the correspondant order
+            self.all_patient_krt_modalities[i] = left_krt_modalities_list.pop()
+            i -= 1
+
     def get(self, request, *args, **kwargs):
         context = {}
         template_name = "patient_register.html"
+
         try:
             patient_id = kwargs["patient_id"]
         except KeyError:
@@ -105,7 +133,6 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
             patientregistration_form = PatientRegistrationForm(
                 instance=patient.patientregistration
             )
-
             try:
                 patientrenaldiagnosis_form = PatientRenalDiagnosisForm(
                     instance=patient.patientrenaldiagnosis
@@ -113,15 +140,52 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
             except PatientRenalDiagnosis.DoesNotExist:
                 patientrenaldiagnosis_form = PatientRenalDiagnosisForm()
 
-            existing_krtmodalities = patient.patientkrtmodality_set.count()
-            patientkrtmodality_iformset = inlineformset_factory(
-                Patient,
-                PatientKRTModality,
-                form=PatientKRTModalityForm,
-                extra=6 - existing_krtmodalities,
-                can_delete=False,
-            )
-            patientkrtmodality_forms = patientkrtmodality_iformset(instance=patient)
+            self.get_krt_modalities(patient)
+            try:
+                patientkrtmodality_first_form = PatientKRTModalityForm(
+                    prefix="krt_first", instance=self.all_patient_krt_modalities[0]
+                )
+            except PatientKRTModality.DoesNotExist:
+                patientkrtmodality_first_form = PatientKRTModalityForm(
+                    prefix="krt_first"
+                )
+
+            try:
+                patientkrtmodality_2_form = PatientKRTModalityForm(
+                    prefix="krt_2", instance=self.all_patient_krt_modalities[1]
+                )
+            except PatientKRTModality.DoesNotExist:
+                patientkrtmodality_2_form = PatientKRTModalityForm(prefix="krt_2")
+
+            try:
+                patientkrtmodality_3_form = PatientKRTModalityForm(
+                    prefix="krt_3", instance=self.all_patient_krt_modalities[2]
+                )
+            except PatientKRTModality.DoesNotExist:
+                patientkrtmodality_3_form = PatientKRTModalityForm(prefix="krt_3")
+
+            try:
+                patientkrtmodality_4_form = PatientKRTModalityForm(
+                    prefix="krt_4", instance=self.all_patient_krt_modalities[3]
+                )
+            except PatientKRTModality.DoesNotExist:
+                patientkrtmodality_4_form = PatientKRTModalityForm(prefix="krt_4")
+
+            try:
+                patientkrtmodality_5_form = PatientKRTModalityForm(
+                    prefix="krt_5", instance=self.all_patient_krt_modalities[4]
+                )
+            except PatientKRTModality.DoesNotExist:
+                patientkrtmodality_5_form = PatientKRTModalityForm(prefix="krt_5")
+
+            try:
+                patientkrtmodality_present_form = PatientKRTModalityForm(
+                    prefix="krt_present", instance=self.all_patient_krt_modalities[5]
+                )
+            except PatientKRTModality.DoesNotExist:
+                patientkrtmodality_present_form = PatientKRTModalityForm(
+                    prefix="krt_present"
+                )
 
             try:
                 patientakimeasurement_form = PatientAKIMeasurementForm(
@@ -130,21 +194,38 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
             except PatientAKImeasurement.DoesNotExist:
                 patientakimeasurement_form = PatientAKIMeasurementForm()
 
-            patient_assessement = PatientAssessment.objects.get(patient=patient)
-            patientassessment_form = PatientAssessmentForm(instance=patient_assessement)
+            # Choosing only the oldest created assessment since more assessments can be added in the Assessment form view
+            patient_assessement = PatientAssessment.objects.filter(
+                patient=patient
+            ).order_by("created_at")[:1]
+            patientassessment_form = PatientAssessmentForm(
+                instance=patient_assessement[0]
+            )
         else:
             title = "Register patient"
             patientregistration_form = PatientRegistrationForm()
             patient_form = PatientForm()
             patientrenaldiagnosis_form = PatientRenalDiagnosisForm()
-            patientkrtmodality_forms = PatientKRTModalityFormSet()
+            patientkrtmodality_first_form = PatientKRTModalityForm(prefix="krt_first")
+            patientkrtmodality_2_form = PatientKRTModalityForm(prefix="krt_2")
+            patientkrtmodality_3_form = PatientKRTModalityForm(prefix="krt_3")
+            patientkrtmodality_4_form = PatientKRTModalityForm(prefix="krt_4")
+            patientkrtmodality_5_form = PatientKRTModalityForm(prefix="krt_5")
+            patientkrtmodality_present_form = PatientKRTModalityForm(
+                prefix="krt_present"
+            )
             patientakimeasurement_form = PatientAKIMeasurementForm()
             patientassessment_form = PatientAssessmentForm()
         context = {
             "patientregistration_form": patientregistration_form,
             "patient_form": patient_form,
             "patientrenaldiagnosis_form": patientrenaldiagnosis_form,
-            "patientkrtmodality_forms": patientkrtmodality_forms,
+            "patientkrtmodality_first_form": patientkrtmodality_first_form,
+            "patientkrtmodality_2_form": patientkrtmodality_2_form,
+            "patientkrtmodality_3_form": patientkrtmodality_3_form,
+            "patientkrtmodality_4_form": patientkrtmodality_4_form,
+            "patientkrtmodality_5_form": patientkrtmodality_5_form,
+            "patientkrtmodality_present_form": patientkrtmodality_present_form,
             "patientakimeasurement_form": patientakimeasurement_form,
             "patientassessment_form": patientassessment_form,
             "view_title": title,
@@ -153,12 +234,14 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
 
     def post(self, request, *args, **kwargs):
         aki_saved = ""
+        first_krt = False
+
         try:
             patient_id = kwargs["patient_id"]
         except KeyError:
             patient_id = None
         if patient_id:
-            # existing patient
+            # update existing patient
             patient = get_object_or_404(Patient, id=patient_id)
 
             patientregistration_form = PatientRegistrationForm(
@@ -173,9 +256,71 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
             except PatientRenalDiagnosis.DoesNotExist:
                 patientrenaldiagnosis_form = PatientRenalDiagnosisForm(request.POST)
 
-            patientkrtmodality_forms = PatientKRTModalityFormSet(
-                request.POST, instance=patient
-            )
+            # Chronology of KRT modalities (the 6 oldest ones)
+            # Note. formset didnt order, thus, use multiple forms of PatientKRTModalityForm
+            self.get_krt_modalities(patient)
+
+            try:
+                patientkrtmodality_first_form = PatientKRTModalityForm(
+                    request.POST,
+                    prefix="krt_first",
+                    instance=self.all_patient_krt_modalities[0],
+                )
+            except PatientKRTModality.DoesNotExist:
+                patientkrtmodality_first_form = PatientKRTModalityForm(
+                    request.POST, prefix="krt_first"
+                )
+            try:
+                patientkrtmodality_2_form = PatientKRTModalityForm(
+                    request.POST,
+                    prefix="krt_2",
+                    instance=self.all_patient_krt_modalities[1],
+                )
+            except PatientKRTModality.DoesNotExist:
+                patientkrtmodality_2_form = PatientKRTModalityForm(
+                    request.POST, prefix="krt_2"
+                )
+            try:
+                patientkrtmodality_3_form = PatientKRTModalityForm(
+                    request.POST,
+                    prefix="krt_3",
+                    instance=self.all_patient_krt_modalities[2],
+                )
+            except PatientKRTModality.DoesNotExist:
+                patientkrtmodality_3_form = PatientKRTModalityForm(
+                    request.POST, prefix="krt_3"
+                )
+            try:
+                patientkrtmodality_4_form = PatientKRTModalityForm(
+                    request.POST,
+                    prefix="krt_4",
+                    instance=self.all_patient_krt_modalities[3],
+                )
+            except PatientKRTModality.DoesNotExist:
+                patientkrtmodality_4_form = PatientKRTModalityForm(
+                    request.POST, prefix="krt_4"
+                )
+            try:
+                patientkrtmodality_5_form = PatientKRTModalityForm(
+                    request.POST,
+                    prefix="krt_5",
+                    instance=self.all_patient_krt_modalities[4],
+                )
+            except PatientKRTModality.DoesNotExist:
+                patientkrtmodality_5_form = PatientKRTModalityForm(
+                    request.POST, prefix="krt_5"
+                )
+            try:
+                patientkrtmodality_present_form = PatientKRTModalityForm(
+                    request.POST,
+                    prefix="krt_present",
+                    instance=self.all_patient_krt_modalities[5],
+                )
+            except PatientKRTModality.DoesNotExist:
+                patientkrtmodality_present_form = PatientKRTModalityForm(
+                    request.POST, prefix="krt_present"
+                )
+
             try:
                 patientakimeasurement_form = PatientAKIMeasurementForm(
                     request.POST, instance=patient.patientakimeasurement
@@ -183,24 +328,53 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
             except PatientAKImeasurement.DoesNotExist:
                 patientakimeasurement_form = PatientAKIMeasurementForm(request.POST)
 
-            patient_assessement = PatientAssessment.objects.get(patient=patient)
+            # Choosing only the oldest created assessment since more assessments can be added in the Assessment form view
+            patient_assessement = PatientAssessment.objects.filter(
+                patient=patient
+            ).order_by("created_at")[:1]
             patientassessment_form = PatientAssessmentForm(
-                request.POST, instance=patient_assessement
+                request.POST, instance=patient_assessement[0]
             )
         else:
-            # new patient
+            # create new patient
             patientregistration_form = PatientRegistrationForm(request.POST)
             patient_form = PatientForm(request.POST)
             patientrenaldiagnosis_form = PatientRenalDiagnosisForm(request.POST)
-            patientkrtmodality_forms = PatientKRTModalityFormSet(request.POST)
+
+            # 6 KRT modalities in registration form
+            patientkrtmodality_first_form = PatientKRTModalityForm(
+                request.POST, prefix="krt_first"
+            )
+            patientkrtmodality_2_form = PatientKRTModalityForm(
+                request.POST, prefix="krt_2"
+            )
+            patientkrtmodality_3_form = PatientKRTModalityForm(
+                request.POST, prefix="krt_3"
+            )
+            patientkrtmodality_4_form = PatientKRTModalityForm(
+                request.POST, prefix="krt_4"
+            )
+            patientkrtmodality_5_form = PatientKRTModalityForm(
+                request.POST, prefix="krt_5"
+            )
+            patientkrtmodality_present_form = PatientKRTModalityForm(
+                request.POST, prefix="krt_present"
+            )
+
             patientakimeasurement_form = PatientAKIMeasurementForm(request.POST)
             patientassessment_form = PatientAssessmentForm(request.POST)
+
         if (
             patient_form.is_valid()
             and patientregistration_form.is_valid()
             and patientrenaldiagnosis_form.is_valid()
             and patientakimeasurement_form.is_valid()
-            and patientkrtmodality_forms.is_valid()
+            and patientkrtmodality_first_form.is_valid()
+            and patientkrtmodality_2_form.is_valid()
+            and patientkrtmodality_3_form.is_valid()
+            and patientkrtmodality_4_form.is_valid()
+            and patientkrtmodality_5_form.is_valid()
+            and patientkrtmodality_present_form.is_valid()
             and patientassessment_form.is_valid()
         ):
             patient = patient_form.save()
@@ -214,10 +388,69 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
             patientrenaldiagnosis.patient = patient
             patientrenaldiagnosis.save()
 
-            patientkrtmodalities = patientkrtmodality_forms.save(commit=False)
-            for patientkrtmodality in patientkrtmodalities:
-                patientkrtmodality.patient = patient
-                patientkrtmodality.save()
+            # Registering the first KRT modality
+            if any(
+                item in patientkrtmodality_first_form.changed_data
+                for item in ["modality", "start_date"]
+            ):
+                patientkrtmodality_first = patientkrtmodality_first_form.save(
+                    commit=False
+                )
+                patientkrtmodality_first.is_first = True
+                patientkrtmodality_first.patient = patient
+                patientkrtmodality_first.save()
+                first_krt = True
+
+            # Registering the rest of the KRT modalities
+            if any(
+                item in patientkrtmodality_2_form.changed_data
+                for item in ["modality", "start_date"]
+            ):
+                patientkrtmodality_2 = patientkrtmodality_2_form.save(commit=False)
+                patientkrtmodality_2.patient = patient
+                patientkrtmodality_2.save()
+
+            if any(
+                item in patientkrtmodality_3_form.changed_data
+                for item in ["modality", "start_date"]
+            ):
+                patientkrtmodality_3 = patientkrtmodality_3_form.save(commit=False)
+                patientkrtmodality_3.patient = patient
+                patientkrtmodality_3.save()
+
+            if any(
+                item in patientkrtmodality_4_form.changed_data
+                for item in ["modality", "start_date"]
+            ):
+                patientkrtmodality_4 = patientkrtmodality_4_form.save(commit=False)
+                patientkrtmodality_4.patient = patient
+                patientkrtmodality_4.save()
+
+            if any(
+                item in patientkrtmodality_5_form.changed_data
+                for item in ["modality", "start_date"]
+            ):
+                patientkrtmodality_5 = patientkrtmodality_5_form.save(commit=False)
+                patientkrtmodality_5.patient = patient
+                patientkrtmodality_5.save()
+
+            # Registering the current KRT modality
+            if any(
+                item in patientkrtmodality_present_form.changed_data
+                for item in ["modality", "start_date"]
+            ):
+                patientkrtmodality_present = patientkrtmodality_present_form.save(
+                    commit=False
+                )
+                patientkrtmodality_present.is_current = True
+                if not first_krt:
+                    # current krt modality is also the first KRT modality
+                    patientkrtmodality_present.is_first = True
+                else:
+                    # if first krt modality is now entered (for edition)
+                    patientkrtmodality_present.is_first = False
+                patientkrtmodality_present.patient = patient
+                patientkrtmodality_present.save()
 
             if patient.in_krt_modality == "Y":
                 patientakimeasurement_form = PatientAKIMeasurementForm()
@@ -250,7 +483,12 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
             "patientregistration_form": patientregistration_form,
             "patient_form": patient_form,
             "patientrenaldiagnosis_form": patientrenaldiagnosis_form,
-            "patientkrtmodality_forms": patientkrtmodality_forms,
+            "patientkrtmodality_first_form": patientkrtmodality_first_form,
+            "patientkrtmodality_2_form": patientkrtmodality_2_form,
+            "patientkrtmodality_3_form": patientkrtmodality_3_form,
+            "patientkrtmodality_4_form": patientkrtmodality_4_form,
+            "patientkrtmodality_5_form": patientkrtmodality_5_form,
+            "patientkrtmodality_present_form": patientkrtmodality_present_form,
             "patientakimeasurement_form": patientakimeasurement_form,
             "patientassessment_form": patientassessment_form,
         }

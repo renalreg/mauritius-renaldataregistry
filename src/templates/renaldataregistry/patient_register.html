@@ -35,6 +35,54 @@
 </ul>
 {% endif %}
 
+{% if patientkrtmodality_first_form.non_field_errors %}
+<ul>
+    {% for error in patientkrtmodality_first_form.non_field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if patientkrtmodality_2_form.non_field_errors %}
+<ul>
+    {% for error in patientkrtmodality_2_form.non_field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if patientkrtmodality_3_form.non_field_errors %}
+<ul>
+    {% for error in patientkrtmodality_3_form.non_field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if patientkrtmodality_4_form.non_field_errors %}
+<ul>
+    {% for error in patientkrtmodality_4_form.non_field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if patientkrtmodality_5_form.non_field_errors %}
+<ul>
+    {% for error in patientkrtmodality_5_form.non_field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if patientkrtmodality_present_form.non_field_errors %}
+<ul>
+    {% for error in patientkrtmodality_present_form.non_field_errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
 <div class="container">
     <div class="m-5">
         <h1>{{ view_title }}</h1>
@@ -139,6 +187,9 @@
                     <div class="mb-3">
                         <h2>Primary renal diagnosis and KRT modality:</h2>
                     </div>
+                    <div class="p-3 mb-2 bg-warning text-dark">
+                        <p>If the present KRT modality is also the first KRT modality for the patient, please enter the information only in the section for Present KRT modality.</p>
+                    </div>
                     <div class="mb-3">
                         {{patientrenaldiagnosis_form.description | as_crispy_field}}
                     </div>
@@ -161,47 +212,64 @@
                         {{patientakimeasurement_form.measurement_date | as_crispy_field}}
                     </div>
                     <p>Give chronology of previous KRT modalities</p>
-                    {{ patientkrtmodality_forms.management_form }}
-                    {% for form in patientkrtmodality_forms %}
-                    {{ form.id.as_hidden }}
-                    {% if forloop.first %}
+                    <!-- registration -->
                     <div class="p-3 mb-2 bg-info text-dark">
                         <legend>First KRT modality</legend>
                         <div class="row g-2">
                             <div class="col-sm">
-                                {{ form.modality | as_crispy_field}}
+                                {{ patientkrtmodality_first_form.modality | as_crispy_field}}
                             </div>
                             <div class="col-sm-6">
-                                {{ form.start_date | as_crispy_field}}
+                                {{ patientkrtmodality_first_form.start_date | as_crispy_field}}
                             </div>
                         </div>
                     </div>
-                    {% elif forloop.last %}
+                    <div class="row g-2">
+                        <div class="col-sm">
+                            {{ patientkrtmodality_2_form.modality | as_crispy_field}}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ patientkrtmodality_2_form.start_date | as_crispy_field}}
+                        </div>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-sm">
+                            {{ patientkrtmodality_3_form.modality | as_crispy_field}}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ patientkrtmodality_3_form.start_date | as_crispy_field}}
+                        </div>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-sm">
+                            {{ patientkrtmodality_4_form.modality | as_crispy_field}}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ patientkrtmodality_4_form.start_date | as_crispy_field}}
+                        </div>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-sm">
+                            {{ patientkrtmodality_5_form.modality | as_crispy_field}}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ patientkrtmodality_5_form.start_date | as_crispy_field}}
+                        </div>
+                    </div>
                     <div class="p-3 mb-2 bg-info text-dark" id="current_krt_modality">
                         <legend>Present KRT modality</legend>
                         <div class="row g-2">
                             <div class="col-sm">
-                                {{ form.modality | as_crispy_field}}
+                                {{ patientkrtmodality_present_form.modality | as_crispy_field}}
                             </div>
                             <div class="col-sm-6">
-                                {{ form.start_date | as_crispy_field}}
+                                {{ patientkrtmodality_present_form.start_date | as_crispy_field}}
                             </div>
                             <div class="col-sm-6">
-                                {{ form.hd_unit | as_crispy_field}}
+                                {{ patientkrtmodality_present_form.hd_unit | as_crispy_field}}
                             </div>
                         </div>
                     </div>
-                    {%else%}
-                    <div class="row g-2">
-                        <div class="col-sm">
-                            {{ form.modality | as_crispy_field}}
-                        </div>
-                        <div class="col-sm-6">
-                            {{ form.start_date | as_crispy_field}}
-                        </div>
-                    </div>
-                    {% endif %}
-                    {% endfor %}
                 </div>
                 <div class="tab">
                     <div class="mb-3">

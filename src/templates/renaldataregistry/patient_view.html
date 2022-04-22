@@ -17,59 +17,86 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td><span class="fw-bold">{% get_verbose_field_name patient.patientregistration "health_institution" %} </span>
+                            <td><span
+                                    class="fw-bold">{% get_verbose_field_name patient.patientregistration "health_institution" %}
+                                </span>
                                 {{ patient.patientregistration.health_institution }}</td>
-                            <td><span class="fw-bold">{% get_verbose_field_name patient.patientregistration "unit" %}</span>
+                            <td><span
+                                    class="fw-bold">{% get_verbose_field_name patient.patientregistration "unit" %}</span>
                                 {% for unit in patient.patientregistration.unit.all %}
                                 {% with ""|add:unit.number|add:"," as units %}
                                 {{ units }}
                                 {% endwith %}
                                 {% endfor %}
                             </td>
-                            <td><span class="fw-bold">{% get_verbose_field_name patient "dob" %} </span> {{ patient.dob }}</td>
+                            <td><span class="fw-bold">{% get_verbose_field_name patient "dob" %} </span>
+                                {{ patient.dob }}</td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td><span class="fw-bold">{% get_verbose_field_name patient "surname" %} </span>{{ patient.surname }}</td>
-                            <td><span class="fw-bold">{% get_verbose_field_name patient "name" %} </span>{{ patient.name }}</td>
+                            <td><span class="fw-bold">{% get_verbose_field_name patient "surname" %}
+                                </span>{{ patient.surname }}</td>
+                            <td><span class="fw-bold">{% get_verbose_field_name patient "name" %}
+                                </span>{{ patient.name }}</td>
                             <td></td>
                             <td></td>
                         </tr>
                         <tr>
-                            <td><span class="fw-bold">{% get_verbose_field_name patient "ethnic" %} </span>{{ patient.get_ethnic_display }}</td>
-                            <td><span class="fw-bold">{% get_verbose_field_name patient "gender" %} </span>{{ patient.get_gender_display }}</td>
-                            <td><span class="fw-bold">{% get_verbose_field_name patient "maritalstatus" %} </span>{{ patient.get_maritalstatus_display }}</td>
-                            <td><span class="fw-bold">{% get_verbose_field_name patient "occupationalstatus" %} </span>{{ patient.get_occupationalstatus_display }}
+                            <td><span class="fw-bold">{% get_verbose_field_name patient "ethnic" %}
+                                </span>{{ patient.get_ethnic_display }}</td>
+                            <td><span class="fw-bold">{% get_verbose_field_name patient "gender" %}
+                                </span>{{ patient.get_gender_display }}</td>
+                            <td><span class="fw-bold">{% get_verbose_field_name patient "maritalstatus" %}
+                                </span>{{ patient.get_maritalstatus_display }}</td>
+                            <td><span class="fw-bold">{% get_verbose_field_name patient "occupationalstatus" %}
+                                </span>{{ patient.get_occupationalstatus_display }}
                             </td>
                         </tr>
                         <tr>
                             <td colspan="4"><span class="fw-bold">Significant previous occupations</span>
-                                {{ patient.prev_occupation1|default_if_none:"--" }}, {{ patient.prev_occupation2|default_if_none:"--" }}, {{ patient.prev_occupation3|default_if_none:"--" }}, {{ patient.prev_occupation4|default_if_none:"--" }}
+                                {{ patient.prev_occupation1|default_if_none:"--" }},
+                                {{ patient.prev_occupation2|default_if_none:"--" }},
+                                {{ patient.prev_occupation3|default_if_none:"--" }},
+                                {{ patient.prev_occupation4|default_if_none:"--" }}
                             </td>
                         </tr>
                         <tr>
-                            <td><span class="fw-bold">{% get_verbose_field_name patient "pid" %} </span>{{ patient.pid }}</td>
+                            <td><span class="fw-bold">{% get_verbose_field_name patient "pid" %}
+                                </span>{{ patient.pid }}</td>
                             <td colspan="3"><span class="fw-bold">Phone Nos</span>
-                                {{ patient.landline_number1|default_if_none:"--" }}, {{ patient.landline_number2|default_if_none:"--" }}, {{ patient.mobile_number1|default_if_none:"--" }}, {{ patient.mobile_number2|default_if_none:"--" }}
+                                {{ patient.landline_number1|default_if_none:"--" }},
+                                {{ patient.landline_number2|default_if_none:"--" }},
+                                {{ patient.mobile_number1|default_if_none:"--" }},
+                                {{ patient.mobile_number2|default_if_none:"--" }}
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="2"><span class="fw-bold">Address </span>{{ patient.street|default_if_none:"--" }} - {{ patient.postcode|default_if_none:"--" }}</td>
+                            <td colspan="2"><span class="fw-bold">Address
+                                </span>{{ patient.street|default_if_none:"--" }} -
+                                {{ patient.postcode|default_if_none:"--" }}</td>
                             <td colspan="2"><span class="fw-bold">Email</span>
                                 {{ patient.email|default_if_none:"--" }}, {{ patient.email2|default_if_none:"--" }}
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="2"><span class="fw-bold">{% get_verbose_field_name patient.patientrenaldiagnosis "description" %} </span>{{ patient.patientrenaldiagnosis.description }}</td>
-                            <td colspan="2"><span class="fw-bold">{% get_verbose_field_name patient.patientrenaldiagnosis "renaldiagnosis" %} </span>{{ patient.patientrenaldiagnosis.renaldiagnosis }}</td>
+                            <td colspan="2"><span
+                                    class="fw-bold">{% get_verbose_field_name patient.patientrenaldiagnosis "description" %}
+                                </span>{{ patient.patientrenaldiagnosis.description }}</td>
+                            <td colspan="2"><span
+                                    class="fw-bold">{% get_verbose_field_name patient.patientrenaldiagnosis "renaldiagnosis" %}
+                                </span>{{ patient.patientrenaldiagnosis.renaldiagnosis }}</td>
                         </tr>
                         <tr>
-                            <td><span class="fw-bold">{% get_verbose_field_name patient "height" %} </span>{{ patient.height|default_if_none:"--" }}</td>
-                            <td colspan="2"><span class="fw-bold">{% get_verbose_field_name patient "weight" %} </span>{{ patient.weight|default_if_none:"--" }}</td>
-                            <td><span class="fw-bold">{% get_verbose_field_name patient "birth_weight" %} </span>{{ patient.birth_weight|default_if_none:"--" }}</td>
+                            <td><span class="fw-bold">{% get_verbose_field_name patient "height" %}
+                                </span>{{ patient.height|default_if_none:"--" }}</td>
+                            <td colspan="2"><span class="fw-bold">{% get_verbose_field_name patient "weight" %}
+                                </span>{{ patient.weight|default_if_none:"--" }}</td>
+                            <td><span class="fw-bold">{% get_verbose_field_name patient "birth_weight" %}
+                                </span>{{ patient.birth_weight|default_if_none:"--" }}</td>
                         </tr>
                         <tr>
-                            <td colspan="4"><span class="fw-bold">{% get_verbose_field_name patient "in_krt_modality" %} </span>{{ patient.in_krt_modality }}</td>
+                            <td colspan="4"><span class="fw-bold">{% get_verbose_field_name patient "in_krt_modality" %}
+                                </span>{{ patient.in_krt_modality }}</td>
                             <!-- todo present only initial KRT modality in this view -->
                         </tr>
                         <tr>

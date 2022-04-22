@@ -3,8 +3,7 @@ import re
 from django import forms
 from django.forms import ModelForm
 
-# pylint: disable=too-many-branches
-# pylint: disable=too-many-statements
+# pylint: disable=too-many-branches, too-many-statements
 
 NIC_ID_PATTERN = re.compile("^[a-z][0-9]{12}[a-z0-9]$", re.I)
 PASS_ID_PATTERN = re.compile("^[a-z0-9]{13}$", re.I)
@@ -44,7 +43,7 @@ class PatientFormValidationMixin(ModelForm):
         if dob is not None:
             if dob > current_date:
                 errors.append(
-                    f"Date of birth({dob.strftime('%d/%m/%Y')}) cannot be after current date({current_date.strftime('%d/%m/%Y')})."
+                    f"Date of birth({dob.strftime('%d/%m/%Y')}) cannot be after current date ({current_date.strftime('%d/%m/%Y')})."
                 )
         if height is not None:
             # Height, valid range 40 - 272 cm
@@ -112,7 +111,7 @@ class PatientRegistrationFormValidationMixin(ModelForm):
         is_unit_required = health_institution.is_unit_required
         unit = cleaned_data.get("unit")
 
-        if is_unit_required == "Y" and not unit:
+        if is_unit_required and not unit:
             errors.append(
                 "Unit number for the selected health institution is required."
             )
@@ -146,7 +145,25 @@ class PatientAKIMeasurementFormValidationMixin(ModelForm):
         if measurement_date is not None:
             if measurement_date > current_date:
                 errors.append(
-                    f"Date of (creatinine, eGFR) measurement({measurement_date.strftime('%d/%m/%Y')}) cannot be after current date({current_date.strftime('%d/%m/%Y')})."
+                    f"Date of (creatinine, eGFR) measurement({measurement_date.strftime('%d/%m/%Y')}) cannot be after current date ({current_date.strftime('%d/%m/%Y')})."
+                )
+        if any(errors):
+            raise forms.ValidationError(errors)
+        return cleaned_data
+
+
+class PatientKRTModalityFormValidationMixin(ModelForm):
+    def clean(self):
+        errors = []
+        current_date = date.today()
+        cleaned_data = super().clean()
+
+        start_date = cleaned_data.get("start_date")
+
+        if start_date is not None:
+            if start_date > current_date:
+                errors.append(
+                    f"The KRT start date ({start_date.strftime('%d/%m/%Y')}) cannot be after current date ({current_date.strftime('%d/%m/%Y')})."
                 )
         if any(errors):
             raise forms.ValidationError(errors)
