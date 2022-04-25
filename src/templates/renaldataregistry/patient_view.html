@@ -17,12 +17,10 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td><span
-                                    class="fw-bold">{% get_verbose_field_name patient.patientregistration "health_institution" %}
+                            <td><span class="fw-bold">{% get_verbose_field_name patient.patientregistration "health_institution" %}
                                 </span>
                                 {{ patient.patientregistration.health_institution }}</td>
-                            <td><span
-                                    class="fw-bold">{% get_verbose_field_name patient.patientregistration "unit" %}</span>
+                            <td><span class="fw-bold">{% get_verbose_field_name patient.patientregistration "unit" %}</span>
                                 {% for unit in patient.patientregistration.unit.all %}
                                 {% with ""|add:unit.number|add:"," as units %}
                                 {{ units }}
@@ -97,66 +95,74 @@
                         <tr>
                             <td colspan="4"><span class="fw-bold">{% get_verbose_field_name patient "in_krt_modality" %}
                                 </span>{{ patient.in_krt_modality }}</td>
-                            <!-- todo present only initial KRT modality in this view -->
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">Chronology of previous and present KRT modalities (Listing max. 6 modalities)
+                                </span>
+                                {% if patient_first_krtmodality %}
+                                <p>Date started: {{ patient_first_krtmodality.start_date|default_if_none:"--" }}, Modality: {{ patient_first_krtmodality.get_modality_display }}</p>
+                                {% endif %}
+                                {% if patient_others_krtmodalities %}
+                                {% for krt_modality in patient_others_krtmodalities.all  %}
+                                <p>Date started: {{ krt_modality.start_date|default_if_none:"--" }}, Modality: {{ krt_modality.get_modality_display }}</p>
+                                {% endfor %}
+                                {% endif %}
+                                {% if patient_current_krtmodality %}
+                                <p>Date started: {{ patient_current_krtmodality.start_date|default_if_none:"--" }}, Modality: {{ patient_current_krtmodality.get_modality_display }}</p>
+                                {% endif %}
+                            </td>
                         </tr>
                         <tr>
                             <td colspan="4"><span class="fw-bold">Comorbidities </span>
-                                <!-- todo present only initial assessment in this view -->
-                                {% for assessment in patient.patientassessment_set.all  %}
-                                {% for comorbidity in assessment.comorbidity.all  %}
+                                {% if patient_assessement %}
+                                {% for comorbidity in patient_assessement.comorbidity.all  %}
                                 <p>{{ comorbidity }}</p>
                                 {% endfor %}
-                                {% endfor %}
+                                {% endif %}
                             </td>
                         </tr>
                         <tr>
                             <td colspan="4"><span class="fw-bold">Disabilities </span>
-                                <!-- todo present only initial assessment in this view -->
-                                {% for assessment in patient.patientassessment_set.all  %}
-                                {% for disability in assessment.disability.all  %}
+                                {% if patient_assessement %}
+                                {% for disability in patient_assessement.disability.all  %}
                                 <p>{{ disability }}</p>
                                 {% endfor %}
-                                {% endfor %}
+                                {% endif %}
                             </td>
                         </tr>
                         <tr>
                             <td colspan="4"><span class="fw-bold">Smoking status </span>
-                                <!-- todo present only initial assessment in this view -->
-                                {% for assessment in patient.patientassessment_set.all  %}
-                                {{ assessment.get_smokingstatus_display }}
-                                {% endfor %}
+                                {% if patient_assessement %}
+                                {{ patient_assessement.get_smokingstatus_display }}
+                                {% endif %}
                             </td>
                         </tr>
                         <tr>
                             <td colspan="4"><span class="fw-bold">Alcohol disorder </span>
-                                <!-- todo present only initial assessment in this view -->
-                                {% for assessment in patient.patientassessment_set.all  %}
-                                {{ assessment.get_alcoholuse_display }}
-                                {% endfor %}
+                                {% if patient_assessement %}
+                                {{ patient_assessement.get_alcoholuse_display }}
+                                {% endif %}
                             </td>
                         </tr>
                         <tr>
                             <td colspan="4"><span class="fw-bold">Hepatitis B </span>
-                                <!-- todo present only initial assessment in this view -->
-                                {% for assessment in patient.patientassessment_set.all  %}
-                                {{ assessment.get_hepatitis_b_display }}
-                                {% endfor %}
+                                {% if patient_assessement %}
+                                {{ patient_assessement.get_hepatitis_b_display }}
+                                {% endif %}
                             </td>
                         </tr>
                         <tr>
                             <td colspan="4"><span class="fw-bold">Hepatitis C </span>
-                                <!-- todo present only initial assessment in this view -->
-                                {% for assessment in patient.patientassessment_set.all  %}
-                                {{ assessment.get_hepatitis_c_display }}
-                                {% endfor %}
+                                {% if patient_assessement %}
+                                {{ patient_assessement.get_hepatitis_c_display }}
+                                {% endif %}
                             </td>
                         </tr>
                         <tr>
                             <td colspan="4"><span class="fw-bold">HIV </span>
-                                <!-- todo present only initial assessment in this view -->
-                                {% for assessment in patient.patientassessment_set.all  %}
-                                {{ assessment.get_hiv_display }}
-                                {% endfor %}
+                                {% if patient_assessement %}
+                                {{ patient_assessement.get_hiv_display }}
+                                {% endif %}
                             </td>
                         </tr>
                         <tr>
