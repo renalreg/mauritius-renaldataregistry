@@ -39,6 +39,44 @@ class PatientView(LoginRequiredMixin, DetailView):
     model = Patient
     template_name = "patient_view.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["patient_first_krtmodality"] = None
+        context["patient_others_krtmodalities"] = []
+        context["patient_current_krtmodality"] = None
+
+        # KRT modalities
+        patient_first_krtmodality = PatientKRTModality.objects.filter(
+            patient=self.object, is_first=True
+        ).first()
+        patient_others_krtmodalities = PatientKRTModality.objects.filter(
+            patient=self.object, is_first=False, is_current=False
+        ).order_by("start_date")[:3]
+        patient_current_krtmodality = PatientKRTModality.objects.filter(
+            patient=self.object, is_current=True
+        ).first()
+
+        if patient_first_krtmodality:
+            if patient_current_krtmodality:
+                if patient_first_krtmodality != patient_current_krtmodality:
+                    context["patient_first_krtmodality"] = patient_first_krtmodality
+            else:
+                context["patient_first_krtmodality"] = patient_first_krtmodality
+        if patient_others_krtmodalities:
+            context["patient_others_krtmodalities"] = patient_others_krtmodalities
+        if patient_current_krtmodality:
+            context["patient_current_krtmodality"] = patient_current_krtmodality
+
+        # assessment
+        patient_assessement = (
+            PatientAssessment.objects.filter(patient=self.object)
+            .order_by("created_at")[:1]
+            .first()
+        )
+        if patient_assessement:
+            context["patient_assessement"] = patient_assessement
+        return context
+
 
 class PatientRegistrationListView(LoginRequiredMixin, ListView):
     paginate_by = 15
@@ -92,6 +130,7 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
     def get_krt_modalities(self, patient):
         """
         Get the 6 oldest KRT modalities
+        alternative to set all_patient_krt_modalities: see get_context_data of PatientView
         """
         left_krt_modalities_list = []
         i = 4
