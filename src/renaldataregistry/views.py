@@ -1,3 +1,4 @@
+import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView, UpdateView, DetailView
 from django.shortcuts import get_object_or_404, render
@@ -234,12 +235,17 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
                 patientakimeasurement_form = PatientAKIMeasurementForm()
 
             # Choosing only the oldest created assessment since more assessments can be added in the Assessment form view
-            patient_assessement = PatientAssessment.objects.filter(
-                patient=patient
-            ).order_by("created_at")[:1]
-            patientassessment_form = PatientAssessmentForm(
-                instance=patient_assessement[0]
+            patient_assessement = (
+                PatientAssessment.objects.filter(patient=patient)
+                .order_by("created_at")[:1]
+                .first()
             )
+            try:
+                patientassessment_form = PatientAssessmentForm(
+                    instance=patient_assessement
+                )
+            except PatientAssessment.DoesNotExist:
+                patientassessment_form = PatientAssessmentForm()
         else:
             title = "Register patient"
             patientregistration_form = PatientRegistrationForm()
@@ -368,12 +374,17 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
                 patientakimeasurement_form = PatientAKIMeasurementForm(request.POST)
 
             # Choosing only the oldest created assessment since more assessments can be added in the Assessment form view
-            patient_assessement = PatientAssessment.objects.filter(
-                patient=patient
-            ).order_by("created_at")[:1]
-            patientassessment_form = PatientAssessmentForm(
-                request.POST, instance=patient_assessement[0]
+            patient_assessement = (
+                PatientAssessment.objects.filter(patient=patient)
+                .order_by("created_at")[:1]
+                .first()
             )
+            try:
+                patientassessment_form = PatientAssessmentForm(
+                    request.POST, instance=patient_assessement
+                )
+            except PatientAssessment.DoesNotExist:
+                patientassessment_form = PatientAssessmentForm(request.POST)
         else:
             # create new patient
             patientregistration_form = PatientRegistrationForm(request.POST)
@@ -420,12 +431,14 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
 
             patientregistration = patientregistration_form.save(commit=False)
             patientregistration.patient = patient
+            patientregistration.created_at = patient.created_at
             patientregistration.save()
             patientregistration_form.save_m2m()
 
-            patientrenaldiagnosis = patientrenaldiagnosis_form.save(commit=False)
-            patientrenaldiagnosis.patient = patient
-            patientrenaldiagnosis.save()
+            if patientrenaldiagnosis_form.has_changed():
+                patientrenaldiagnosis = patientrenaldiagnosis_form.save(commit=False)
+                patientrenaldiagnosis.patient = patient
+                patientrenaldiagnosis.save()
 
             # Registering the first KRT modality
             if any(
@@ -437,6 +450,7 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
                 )
                 patientkrtmodality_first.is_first = True
                 patientkrtmodality_first.patient = patient
+                patientkrtmodality_first.created_at = patient.created_at
                 patientkrtmodality_first.save()
                 first_krt = True
 
@@ -447,6 +461,7 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
             ):
                 patientkrtmodality_2 = patientkrtmodality_2_form.save(commit=False)
                 patientkrtmodality_2.patient = patient
+                patientkrtmodality_2.created_at = patient.created_at
                 patientkrtmodality_2.save()
 
             if any(
@@ -455,6 +470,7 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
             ):
                 patientkrtmodality_3 = patientkrtmodality_3_form.save(commit=False)
                 patientkrtmodality_3.patient = patient
+                patientkrtmodality_3.created_at = patient.created_at
                 patientkrtmodality_3.save()
 
             if any(
@@ -463,6 +479,7 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
             ):
                 patientkrtmodality_4 = patientkrtmodality_4_form.save(commit=False)
                 patientkrtmodality_4.patient = patient
+                patientkrtmodality_4.created_at = patient.created_at
                 patientkrtmodality_4.save()
 
             if any(
@@ -471,6 +488,7 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
             ):
                 patientkrtmodality_5 = patientkrtmodality_5_form.save(commit=False)
                 patientkrtmodality_5.patient = patient
+                patientkrtmodality_5.created_at = patient.created_at
                 patientkrtmodality_5.save()
 
             # Registering the current KRT modality
@@ -489,23 +507,24 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
                     # if first krt modality is now entered (for edition)
                     patientkrtmodality_present.is_first = False
                 patientkrtmodality_present.patient = patient
+                patientkrtmodality_present.created_at = patient.created_at
                 patientkrtmodality_present.save()
 
             if patient.in_krt_modality == "Y":
-                patientakimeasurement_form = PatientAKIMeasurementForm()
-                patientakimeasures = patientakimeasurement_form.save(commit=False)
-                patientakimeasures.patient = patient
-                patientakimeasures.save()
                 aki_saved = " AKI measures are null because patient is in KRT."
             else:
-                patientakimeasures = patientakimeasurement_form.save(commit=False)
-                patientakimeasures.patient = patient
-                patientakimeasures.save()
+                if patientakimeasurement_form.has_changed():
+                    patientakimeasures = patientakimeasurement_form.save(commit=False)
+                    patientakimeasures.patient = patient
+                    patientakimeasures.created_at = patient.created_at
+                    patientakimeasures.save()
 
-            patientassessment = patientassessment_form.save(commit=False)
-            patientassessment.patient = patient
-            patientassessment.save()
-            patientassessment_form.save_m2m()
+            if patientassessment_form.has_changed():
+                patientassessment = patientassessment_form.save(commit=False)
+                patientassessment.patient = patient
+                patientassessment.created_at = patient.created_at
+                patientassessment.save()
+                patientassessment_form.save_m2m()
 
             messages.success(
                 self.request,
@@ -549,15 +568,121 @@ class PatientAssessmentView(LoginRequiredMixin, CreateView):
         return render(request, "patient_assess.html", context)
 
 
-class PatientModalityView(LoginRequiredMixin, CreateView):
+class PatientModalityListView(LoginRequiredMixin, ListView):
+    model = PatientKRTModality
+    template_name = "patientmodality_list.html"
+
+    def get_queryset(self):
+        """
+        Overwrites the get_query_set to add search option
+        """
+        try:
+            patient_id = self.kwargs["patient_id"]
+        except KeyError:
+            patient_id = None
+
+        all_patientkrtmodalities = PatientKRTModality.objects.filter(
+            patient=patient_id
+        ).order_by("start_date")
+
+        return all_patientkrtmodalities
+
+
+class PatientModalityView(LoginRequiredMixin, UpdateView):
     def get(self, request, *args, **kwargs):
-        patientkrtmodality_form = PatientKRTModalityForm()
-        patientakimeasurement_form = PatientAKIMeasurementForm()
+        template_name = "patient_modality.html"
+        is_first = True
+
+        # Edition of existing patient KRT modality
+        try:
+            modality_id = kwargs["modality_id"]
+        except KeyError:
+            modality_id = None
+
+        # Start of patient KRT modality
+        try:
+            patient_id = kwargs["patient_id"]
+        except KeyError:
+            patient_id = None
+
+        if modality_id:
+            title = "Edit modality"
+        else:
+            if patient_id:
+                title = "Start modality"
+                patientkrtmodality_form = PatientKRTModalityForm()
+                patientakimeasurement_form = PatientAKIMeasurementForm()
+                patientassessment_form = PatientAssessmentForm()
+
+                num_patientkrtmodalities = PatientKRTModality.objects.filter(
+                    patient=patient_id
+                ).count()
+                if num_patientkrtmodalities > 0:
+                    is_first = False
+
         context = {
             "patientkrtmodality_form": patientkrtmodality_form,
             "patientakimeasurement_form": patientakimeasurement_form,
+            "patientassessment_form": patientassessment_form,
+            "view_title": title,
+            "is_first": is_first,
         }
-        return render(request, "patient_modality.html", context)
+        return render(request, template_name, context)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            patient_id = kwargs["patient_id"]
+        except KeyError:
+            patient_id = None
+        if patient_id:
+            patient = get_object_or_404(Patient, id=patient_id)
+
+            patientkrtmodality_form = PatientKRTModalityForm(request.POST)
+            patientakimeasurement_form = PatientAKIMeasurementForm(request.POST)
+            patientassessment_form = PatientAssessmentForm(request.POST)
+
+            if (
+                patientkrtmodality_form.is_valid()
+                and patientakimeasurement_form.is_valid()
+                and patientassessment_form.is_valid()
+            ):
+                creation_date = datetime.datetime.now()
+                if patientkrtmodality_form.has_changed():
+                    patientkrtmodality = patientkrtmodality_form.save(commit=False)
+                    patientkrtmodality.patient = patient
+                    patientkrtmodality.created_at = creation_date
+                    patientkrtmodality.save()
+
+                if patientakimeasurement_form.has_changed():
+                    patientakimeasurement = patientakimeasurement_form.save(
+                        commit=False
+                    )
+                    patientakimeasurement.patient = patient
+                    patientakimeasurement.created_at = creation_date
+                    patientakimeasurement.save()
+
+                if patientassessment_form.has_changed():
+                    patientassessment = patientassessment_form.save(commit=False)
+                    patientassessment.patient = patient
+                    patientassessment.created_at = creation_date
+                    patientassessment.save()
+
+                messages.success(
+                    self.request,
+                    "Completed.",
+                    extra_tags="alert",
+                )
+                return redirect(
+                    "renaldataregistry:PatientModalityListView", patient_id=patient_id
+                )
+            # tocomplete
+            messages.error(
+                self.request,
+                "The action was not completed, please see below.",
+                extra_tags="alert",
+            )
+        # tocomplete
+        return redirect("renaldataregistry:PatientRegistrationListView")
 
 
 class PatientStopView(LoginRequiredMixin, CreateView):

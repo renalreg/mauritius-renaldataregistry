@@ -65,6 +65,9 @@
                         <td><a
                                 href="{% url 'renaldataregistry:PatientRecordView' patientregistration.patient.id %}">View</a>
                         </td>
+                        <td><a
+                            href="{% url 'renaldataregistry:PatientModalityListView' patientregistration.patient.id %}">Modality</a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </table>

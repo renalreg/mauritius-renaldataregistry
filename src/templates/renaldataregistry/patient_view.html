@@ -77,12 +77,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="2"><span
-                                    class="fw-bold">{% get_verbose_field_name patient.patientrenaldiagnosis "description" %}
-                                </span>{{ patient.patientrenaldiagnosis.description }}</td>
-                            <td colspan="2"><span
-                                    class="fw-bold">{% get_verbose_field_name patient.patientrenaldiagnosis "renaldiagnosis" %}
-                                </span>{{ patient.patientrenaldiagnosis.renaldiagnosis }}</td>
+                            <td colspan="2"><span class="fw-bold">Primary renal diagnosis</span>{{ patient.patientrenaldiagnosis.description }}</td>
+                            <td colspan="2"><span class="fw-bold">ERA-EDTA CODE</span>{{ patient.patientrenaldiagnosis.renaldiagnosis }}</td>
                         </tr>
                         <tr>
                             <td><span class="fw-bold">{% get_verbose_field_name patient "height" %}

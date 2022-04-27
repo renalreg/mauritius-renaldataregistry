@@ -197,7 +197,7 @@ class PatientRegistration(models.Model):
         blank=True,
         null=True,
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField()
     updated_by = models.ForeignKey(
         CustomUser,
         on_delete=models.SET_NULL,
@@ -457,11 +457,10 @@ class PatientKRTModality(models.Model):
         verbose_name="Patient",
     )
     MOD_CHOICES = (
-        (1, "None"),
-        (2, "NK"),
-        (3, "HD"),
-        (4, "PD"),
-        (5, "TX"),
+        (1, "NK"),
+        (2, "HD"),
+        (3, "PD"),
+        (4, "TX"),
     )
     INITIALACCESS_CHOICES = (
         (0, "Unknown"),
@@ -536,7 +535,7 @@ class PatientKRTModality(models.Model):
         choices=INITIALACCESS_CHOICES,
         default=0,
         blank=True,
-        verbose_name="If HD was the first KRT, what was the initial access?",
+        verbose_name="Access on first HD",
     )
     hd_sessions = models.PositiveSmallIntegerField(
         blank=True, null=True, verbose_name="Sessions/week"
@@ -640,6 +639,22 @@ class PatientKRTModality(models.Model):
         blank=True,
         verbose_name="PD insertion technique:",
     )
+    created_by = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        related_name="pkrt_created_by",
+        blank=True,
+        null=True,
+    )
+    created_at = models.DateTimeField()
+    updated_by = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        related_name="pkrt_updated_by",
+        blank=True,
+        null=True,
+    )
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class PatientAKImeasurement(models.Model):
@@ -670,6 +685,22 @@ class PatientAKImeasurement(models.Model):
         blank=True,
         null=True,
     )
+    created_by = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        related_name="paki_created_by",
+        blank=True,
+        null=True,
+    )
+    created_at = models.DateTimeField()
+    updated_by = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        related_name="paki_updated_by",
+        blank=True,
+        null=True,
+    )
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class PatientAssessment(models.Model):
@@ -756,7 +787,7 @@ class PatientAssessment(models.Model):
         blank=True,
         null=True,
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField()
     updated_by = models.ForeignKey(
         CustomUser,
         on_delete=models.SET_NULL,

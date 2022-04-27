@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="m-5">
+        <h1>Chronology of patient KRT modalities</h1>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-10 d-flex justify-content-center">
+            <a href="{% url 'renaldataregistry:PatientModalityView' view.kwargs.patient_id %}" class="link-primary">Start new modality</a>
+        </div>
+        <div class="col-10">
+            {% if patientkrtmodality_list %}
+            <div class="table-responsive">
+                <table class='table align-middle'>
+                    <thead>
+                        <tr class="text-center">
+                            <th>Modality</th>
+                            <th>Start date</th>
+                            <th>Current modality</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for patientmodality in patientkrtmodality_list %}
+                        <tr class="text-center">
+                            <td>{{patientmodality.get_modality_display}}</td>
+                            <td>{{patientmodality.start_date}}</td>
+                            <td>{{patientmodality.is_current}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p>There are no records.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
