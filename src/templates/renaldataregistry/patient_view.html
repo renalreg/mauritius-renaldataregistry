@@ -7,6 +7,9 @@
     </div>
     <div class="row justify-content-center">
         <div class="col-10">
+            <div class="p-3 mb-2 bg-warning text-dark">
+                <p>Please note the information presented here is the data entered in the Patient's registration form.</p>
+            </div>
             <div class="table-responsive">
                 <table class="table align-middle">
                     <thead>
@@ -77,12 +80,8 @@
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="2"><span
-                                    class="fw-bold">{% get_verbose_field_name patient.patientrenaldiagnosis "description" %}
-                                </span>{{ patient.patientrenaldiagnosis.description }}</td>
-                            <td colspan="2"><span
-                                    class="fw-bold">{% get_verbose_field_name patient.patientrenaldiagnosis "renaldiagnosis" %}
-                                </span>{{ patient.patientrenaldiagnosis.renaldiagnosis }}</td>
+                            <td colspan="2"><span class="fw-bold">Primary renal diagnosis </span>{{ patient.patientrenaldiagnosis.description }}</td>
+                            <td colspan="2"><span class="fw-bold">ERA-EDTA CODE </span>{{ patient.patientrenaldiagnosis.renaldiagnosis }}</td>
                         </tr>
                         <tr>
                             <td><span class="fw-bold">{% get_verbose_field_name patient "height" %}
@@ -99,16 +98,10 @@
                         <tr>
                             <td colspan="4"><span class="fw-bold">Chronology of previous and present KRT modalities (Listing max. 6 modalities)
                                 </span>
-                                {% if patient_first_krtmodality %}
-                                <p>Date started: {{ patient_first_krtmodality.start_date|default_if_none:"--" }}, Modality: {{ patient_first_krtmodality.get_modality_display }}</p>
-                                {% endif %}
-                                {% if patient_others_krtmodalities %}
-                                {% for krt_modality in patient_others_krtmodalities.all  %}
+                                {% if patient_krtmodalities %}
+                                {% for krt_modality in patient_krtmodalities.all  %}
                                 <p>Date started: {{ krt_modality.start_date|default_if_none:"--" }}, Modality: {{ krt_modality.get_modality_display }}</p>
                                 {% endfor %}
-                                {% endif %}
-                                {% if patient_current_krtmodality %}
-                                <p>Date started: {{ patient_current_krtmodality.start_date|default_if_none:"--" }}, Modality: {{ patient_current_krtmodality.get_modality_display }}</p>
                                 {% endif %}
                             </td>
                         </tr>

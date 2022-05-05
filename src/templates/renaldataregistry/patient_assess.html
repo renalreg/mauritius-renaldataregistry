@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% block extrahead %}
-{{ patient_form.media }}
 {% load static %}
 <script src="{% static 'js/form_tabs.js' %}"></script>
 <script src="{% static 'js/patient_assess.js' %}"></script>
@@ -20,39 +19,28 @@
 {% endif %}
 
 <div class="container">
-    <h1>Assess patient</h1>
+    <div class="m-5">
+        <h1>{{ view_title }}</h1>
+    </div>
     <div class="row justify-content-center">
         <div class="col-5">
             <form class="" id="mrr_form" action="" method="post">
                 {% csrf_token %}
                 <div class="tab">
-                    <div class="mb-3">
-                        Health institution: {{ patient.patientregistration.health_institution }}
-                    </div>
-                    <div class="mb-3">
-                        Unit: {{ patient.patientregistration.unit }}
-                    </div>
-                </div>
-                <div class="tab">
-                    <div class="mb-3">
-                        <h2>KRT modality:</h2>
-                    </div>
                     <div class="p-3 mb-2 bg-info text-dark">
-                        <legend>Current modality</legend>
-                        <div class="row g-2">
-                            <div class="col-sm">
-                                {{patientkrtmodality_form.modality | as_crispy_field}}
-                            </div>
-                        </div>
+                            Current patient's KRT modality: <span class="fw-bold">{{ patient_current_krtmodality.get_modality_display }}</span>
+                            <input type="hidden" name="modality" value="{{patient_current_krtmodality.modality}}" />
                     </div>
                     <div class="mb-3">
                         {{patientassessment_form.posthd_weight | as_crispy_field}}
                     </div>
+                    {% if patient_current_krtmodality.modality == 2 %}
+                    <!-- modality 2 = HD -->
                     <div class="mb-3">
                         {{patientkrtmodality_form.hd_unit | as_crispy_field}}
                     </div>
                     <div class="mb-3">
-                        {{patientkrtmodality_form.hd_initialaccess | as_crispy_field}}
+                        <span class="fw-bold">HD prescription:</span>
                     </div>
                     <div class="mb-3">
                         {{patientkrtmodality_form.hd_sessions | as_crispy_field}}
@@ -61,14 +49,23 @@
                         {{patientkrtmodality_form.hd_minssessions | as_crispy_field}}
                     </div>
                     <div class="mb-3">
+                        <span class="fw-bold">HD adequacy:</span>
+                    </div>
+                    <div class="mb-3">
                         {{patientkrtmodality_form.hd_adequacy_urr | as_crispy_field}}
                     </div>
                     <div class="mb-3">
                         {{patientkrtmodality_form.hd_adequacy_kt | as_crispy_field}}
                     </div>
                     <div class="mb-3">
+                        {{patientkrtmodality_form.hd_initialaccess | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
                         {{patientkrtmodality_form.hd_ntcreason | as_crispy_field}}
                     </div>
+                    {% endif %}
+                    {% if patient_current_krtmodality.modality == 3 %}
+                    <!-- modality 3 = PD -->
                     <div class="mb-3">
                         {{patientkrtmodality_form.pd_exchangesday | as_crispy_field}}
                     </div>
@@ -81,6 +78,7 @@
                     <div class="mb-3">
                         {{patientkrtmodality_form.pd_bp | as_crispy_field}}
                     </div>
+                    {% endif %}
                 </div>
                 <div class="tab">
                     <div class="mb-3">
@@ -129,7 +127,6 @@
                     <button type="button" class="nextBtn btn btn-primary btn-block btn-sm">Next</button>
                 </div>
                 <div style="text-align:center;margin-top:40px;">
-                    <span class="step"></span>
                     <span class="step"></span>
                     <span class="step"></span>
                     <span class="step"></span>

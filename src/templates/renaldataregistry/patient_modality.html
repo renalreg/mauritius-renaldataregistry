@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block extrahead %}
-{{ patient_form.media }}
+{{ patientakimeasurement_form.media }}
 {% load static %}
 <script src="{% static 'js/form_tabs.js' %}"></script>
 <script src="{% static 'js/patient_modality.js' %}"></script>
@@ -20,15 +20,20 @@
 {% endif %}
 
 <div class="container">
-    <h1>Start of KRT modality</h1>
+    <div class="m-5">
+        <h1>{{ view_title }}</h1>
+    </div>
     <div class="row justify-content-center">
         <div class="col-5">
-            <p>There are no KRT modality records for this patient. This is the first KRT modality.</p>
             <form class="" id="mrr_form" action="" method="post">
+                <input type="hidden" name="krt_is_first" value="{{krt_is_first}}" />
                 {% csrf_token %}
                 <div class="tab">
                     <div class="mb-3">
-                        <h2>New modality:</h2>
+                        <h2>New modality for patient:</h2>
+                    </div>
+                    <div class="p-3 mb-2 bg-warning text-dark">
+                        <p>The modality edited in this form will become the patient's current KRT modality.</p>
                     </div>
                     <div class="col-sm">
                         {{patientkrtmodality_form.modality | as_crispy_field}}
@@ -36,6 +41,7 @@
                     <div class="mb-3">
                         {{patientkrtmodality_form.hd_unit | as_crispy_field}}
                     </div>
+                    {% if krt_is_first %}
                     <div class="mb-3">
                         {{patientkrtmodality_form.before_KRT | as_crispy_field}}
                     </div>
@@ -57,14 +63,17 @@
                     <div class="mb-3">
                         {{patientkrtmodality_form.hepB_vac | as_crispy_field}}
                     </div>
+                    {% endif %}
                 </div>
                 <div class="tab">
+                    {% if krt_is_first %}
                     <div class="mb-3">
                         {{patientkrtmodality_form.delay_start | as_crispy_field}}
                     </div>
                     <div class="mb-3">
                         {{patientkrtmodality_form.delay_beforedialysis | as_crispy_field}}
                     </div>
+                    {% endif %}
                     <div class="mb-3">
                         {{patientkrtmodality_form.hd_initialaccess | as_crispy_field}}
                     </div>
@@ -78,11 +87,38 @@
                         {{patientkrtmodality_form.pd_insertiontechnique | as_crispy_field}}
                     </div>
                 </div>
+                <div class="tab">
+                    <div class="mb-3">
+                        <h2>Assessment:</h2>
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessment_form.comorbidity | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessment_form.disability | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessment_form.smokingstatus | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessment_form.alcoholuse | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessment_form.hepatitis_b | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessment_form.hepatitis_c | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessment_form.hiv | as_crispy_field}}
+                    </div>
+                </div>
                 <div class="mb-3">
                     <button type="button" class="prevBtn btn btn-primary btn-block btn-sm">Previous</button>
                     <button type="button" class="nextBtn btn btn-primary btn-block btn-sm">Next</button>
                 </div>
                 <div style="text-align:center;margin-top:40px;">
+                    <span class="step"></span>
                     <span class="step"></span>
                     <span class="step"></span>
                 </div>

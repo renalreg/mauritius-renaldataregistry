@@ -1,43 +1,40 @@
 {% extends 'base.html' %}
 
 {% block extrahead %}
-{{ patient_form.media }}
+{{ patientstop_form.media }}
 {% load static %}
-<script src="{% static 'js/form_tabs.js' %}"></script>
+<script src="{% static 'js/patient_stop.js' %}"></script>
 <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 {% endblock %}
 
 {% load crispy_forms_tags %}
 {% block content %}
 
-{% if patient_form.non_field_errors %}
-<ul>
-    {% for error in patient_form.non_field_errors %}
-    <li>{{ error }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-
 <div class="container">
-    <h1>Start of KRT modality</h1>
+    <div class="m-5">
+        <h1>{{ view_title }}</h1>
+    </div>
     <div class="row justify-content-center">
         <div class="col-5">
-            <form class="" id="mrr_form" action="" method="post">
+            <form class="" action="" method="post">
                 {% csrf_token %}
-                <div class="tab">
-                    <div class="mb-3">
-                        <h2>Patient stopping dialysis:</h2>
-                    </div>
-                    <div class="col-sm">
-                        {{patientstop_form}}
-                    </div>
+                <div class="mb-3">
+                    <h2>Patient stopping dialysis:</h2>
                 </div>
                 <div class="mb-3">
-                    <button type="button" class="prevBtn btn btn-primary btn-block btn-sm">Previous</button>
-                    <button type="button" class="nextBtn btn btn-primary btn-block btn-sm">Next</button>
+                    {{patientstop_form.last_dialysis_date | as_crispy_field}}
                 </div>
-                <div style="text-align:center;margin-top:40px;">
-                    <span class="step"></span>
+                <div class="mb-3">
+                    {{patientstop_form.stop_reason | as_crispy_field}}
+                </div>
+                <div class="mb-3 dod">
+                    {{patientstop_form.dod | as_crispy_field}}
+                </div>
+                <div class="mb-3 dod">
+                    {{patientstop_form.cause_of_death | as_crispy_field}}
+                </div>
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary btn-block btn-sm">Submit</button>
                 </div>
             </form>
         </div>
