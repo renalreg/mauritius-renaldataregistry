@@ -2,6 +2,8 @@ from simple_history.models import HistoricalRecords
 from django.db import models
 from users.models import CustomUser
 
+# pylint: disable=too-many-lines
+
 
 class Patient(models.Model):
     TYPE_CHOICES = (
@@ -376,63 +378,6 @@ class Disability(models.Model):
         return self.disability
 
 
-class LaboratoryParameter(models.Model):
-    parameter = models.CharField(max_length=100)
-    created_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="lp_created_by",
-        blank=True,
-        null=True,
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="lp_updated_by",
-        blank=True,
-        null=True,
-    )
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.parameter
-
-
-class Medication(models.Model):
-    TYPE_CHOICES = (
-        (1, "ESA dose"),
-        (2, "IV iron dose"),
-        (3, "Anti-diabetics Y/N"),
-        (4, "Antihypertensives Y/N"),
-    )
-    medication = models.CharField(max_length=100)
-    type = models.PositiveSmallIntegerField(
-        choices=TYPE_CHOICES,
-        default=1,
-        verbose_name="Medication type",
-    )
-    created_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="m_created_by",
-        blank=True,
-        null=True,
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="m_updated_by",
-        blank=True,
-        null=True,
-    )
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.medication
-
-
 class PatientRenalDiagnosis(models.Model):
     patient = models.OneToOneField(Patient, on_delete=models.CASCADE, primary_key=True)
     renaldiagnosis = models.ForeignKey(
@@ -799,24 +744,65 @@ class PatientAssessment(models.Model):
 
 
 class PatientLPAssessment(models.Model):
-    patientassessment = models.ForeignKey(
-        "PatientAssessment",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
+    patientassessment = models.OneToOneField(
+        PatientAssessment, on_delete=models.CASCADE, primary_key=True
     )
-    laboratoryparameter = models.ForeignKey(
-        "LaboratoryParameter",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-    )
-    assessment_value = models.DecimalField(
+    hb_gdl = models.DecimalField(
         max_digits=5,
         decimal_places=2,
         blank=True,
         null=True,
-        verbose_name="Value",
+        verbose_name="Hb g/dl",
+    )
+    calcium = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Calcium mmol/l",
+    )
+    ferritin = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Ferritin ng/ml",
+    )
+    albumin = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Albumin g/l",
+    )
+    phosphate = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Phosphate mmol/l",
+    )
+    tsat = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name="TSAT %*",
+    )
+    bicarbonate = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Bicarbonate mmol/l",
+    )
+    hba1c = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name="HbA1C %*",
+    )
+    pth = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name="PTH pmol/l*",
     )
 
     class Meta:
@@ -824,19 +810,137 @@ class PatientLPAssessment(models.Model):
 
 
 class PatientMedicationAssessment(models.Model):
-    patientassessment = models.ForeignKey(
-        "PatientAssessment",
-        on_delete=models.CASCADE,
+    Y_N_CHOICES = (
+        ("Y", "Yes"),
+        ("N", "No"),
+    )
+    patientassessment = models.OneToOneField(
+        PatientAssessment, on_delete=models.CASCADE, primary_key=True
+    )
+    iu_wk = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="iu/wk (short acting)",
+    )
+    mcg2 = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="mcg/2 wk (darbo.)",
+    )
+    mcg4 = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="mcg/4 wk (mircera)",
+    )
+    mg = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="mg/month",
+    )
+    insulin = models.CharField(
+        max_length=1,
+        choices=Y_N_CHOICES,
+        default="N",
+        verbose_name="Insulin",
+    )
+    sulphonylureas = models.CharField(
+        max_length=1,
+        choices=Y_N_CHOICES,
+        default="N",
+        verbose_name="Sulphonylureas",
+    )
+    antidiab_others1 = models.CharField(
+        max_length=50,
+        verbose_name="1",
         blank=True,
         null=True,
     )
-    medication = models.ForeignKey(
-        "Medication",
-        on_delete=models.CASCADE,
+    antidiab_others2 = models.CharField(
+        max_length=50,
+        verbose_name="2",
         blank=True,
         null=True,
     )
-    medication_value = models.CharField(max_length=6, blank=True, null=True)
+    antidiab_others3 = models.CharField(
+        max_length=50,
+        verbose_name="3",
+        blank=True,
+        null=True,
+    )
+    acei = models.CharField(
+        max_length=1,
+        choices=Y_N_CHOICES,
+        default="N",
+        verbose_name="ACEi",
+    )
+    arb = models.CharField(
+        max_length=1,
+        choices=Y_N_CHOICES,
+        default="N",
+        verbose_name="ARB",
+    )
+    cc_blocker = models.CharField(
+        max_length=1,
+        choices=Y_N_CHOICES,
+        default="N",
+        verbose_name="CC Blocker",
+    )
+    beta_blocker = models.CharField(
+        max_length=1,
+        choices=Y_N_CHOICES,
+        default="N",
+        verbose_name="Beta Blocker",
+    )
+    alpha_blocker = models.CharField(
+        max_length=1,
+        choices=Y_N_CHOICES,
+        default="N",
+        verbose_name="Alpha Blocker",
+    )
+    methyldopa = models.CharField(
+        max_length=1,
+        choices=Y_N_CHOICES,
+        default="N",
+        verbose_name="Methyldopa",
+    )
+    antihypertensives_others1 = models.CharField(
+        max_length=50,
+        verbose_name="1",
+        blank=True,
+        null=True,
+    )
+    antihypertensives_others2 = models.CharField(
+        max_length=50,
+        verbose_name="2",
+        blank=True,
+        null=True,
+    )
+    antihypertensives_others3 = models.CharField(
+        max_length=50,
+        verbose_name="3",
+        blank=True,
+        null=True,
+    )
+    antihypertensives_others4 = models.CharField(
+        max_length=50,
+        verbose_name="4",
+        blank=True,
+        null=True,
+    )
+    antihypertensives_others5 = models.CharField(
+        max_length=50,
+        verbose_name="5",
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         db_table = "renaldataregistry_patientassessment_med"
@@ -862,15 +966,19 @@ class PatientStop(models.Model):
     )
     last_dialysis_date = models.DateField(
         verbose_name="Date of last dialysis",
+        blank=True,
+        null=True,
     )
     stop_reason = models.CharField(
         max_length=3,
         choices=ENDREASON_CHOICES,
         default="D",
-        verbose_name="Why AVF/AVG not used to initiate HD?",
+        verbose_name="Reason",
     )
     dod = models.DateField(
         verbose_name="Date of death",
+        blank=True,
+        null=True,
     )
     cause_of_death = models.CharField(
         max_length=2,

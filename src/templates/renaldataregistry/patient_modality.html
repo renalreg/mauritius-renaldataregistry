@@ -26,10 +26,14 @@
     <div class="row justify-content-center">
         <div class="col-5">
             <form class="" id="mrr_form" action="" method="post">
+                <input type="hidden" name="krt_is_first" value="{{krt_is_first}}" />
                 {% csrf_token %}
                 <div class="tab">
                     <div class="mb-3">
                         <h2>New modality for patient:</h2>
+                    </div>
+                    <div class="p-3 mb-2 bg-warning text-dark">
+                        <p>The modality edited in this form will become the patient's current KRT modality.</p>
                     </div>
                     <div class="col-sm">
                         {{patientkrtmodality_form.modality | as_crispy_field}}
@@ -37,7 +41,7 @@
                     <div class="mb-3">
                         {{patientkrtmodality_form.hd_unit | as_crispy_field}}
                     </div>
-                    {% if is_first %}
+                    {% if krt_is_first %}
                     <div class="mb-3">
                         {{patientkrtmodality_form.before_KRT | as_crispy_field}}
                     </div>
@@ -62,7 +66,7 @@
                     {% endif %}
                 </div>
                 <div class="tab">
-                    {% if is_first %}
+                    {% if krt_is_first %}
                     <div class="mb-3">
                         {{patientkrtmodality_form.delay_start | as_crispy_field}}
                     </div>
@@ -85,7 +89,7 @@
                 </div>
                 <div class="tab">
                     <div class="mb-3">
-                        <h2>Initial assessment:</h2>
+                        <h2>Assessment:</h2>
                     </div>
                     <div class="mb-3">
                         {{patientassessment_form.comorbidity | as_crispy_field}}

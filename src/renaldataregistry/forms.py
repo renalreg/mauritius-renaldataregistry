@@ -18,9 +18,9 @@ from .models import (
     PatientKRTModality,
     PatientAKImeasurement,
     PatientAssessment,
-    LaboratoryParameter,
-    Medication,
     PatientStop,
+    PatientLPAssessment,
+    PatientMedicationAssessment,
 )
 
 
@@ -155,40 +155,54 @@ class PatientAssessmentForm(ModelForm):
         }
 
 
-class PatientAssessmentLPForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        all_lp = LaboratoryParameter.objects.all()
+class PatientAssessmentLPForm(ModelForm):
+    class Meta:
+        model = PatientLPAssessment
+        fields = [
+            "hb_gdl",
+            "calcium",
+            "ferritin",
+            "albumin",
+            "phosphate",
+            "tsat",
+            "bicarbonate",
+            "hba1c",
+            "pth",
+        ]
 
-        for _, laboratory_parameter in enumerate(all_lp):
-            field_name = laboratory_parameter.parameter
-            self.fields[field_name] = forms.DecimalField(
-                decimal_places=2, max_digits=5, required=False
-            )
 
-
-class PatientAssessmentMedicationForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        all_med = Medication.objects.all()
-
-        answer_choices = (
-            (1, "Yes"),
-            (2, "No"),
-        )
-
-        for _, medication in enumerate(all_med):
-            field_name = medication.medication
-
-            if medication.type in (3, 4):
-                self.fields[field_name] = forms.ChoiceField(choices=answer_choices)
-            else:
-                self.fields[field_name] = forms.DecimalField(
-                    decimal_places=2, max_digits=5, required=False
-                )
+class PatientAssessmentMedicationForm(ModelForm):
+    class Meta:
+        model = PatientMedicationAssessment
+        fields = [
+            "iu_wk",
+            "mcg2",
+            "mcg4",
+            "mg",
+            "insulin",
+            "sulphonylureas",
+            "antidiab_others1",
+            "antidiab_others2",
+            "antidiab_others3",
+            "acei",
+            "arb",
+            "cc_blocker",
+            "beta_blocker",
+            "alpha_blocker",
+            "methyldopa",
+            "antihypertensives_others1",
+            "antihypertensives_others2",
+            "antihypertensives_others3",
+            "antihypertensives_others4",
+            "antihypertensives_others5",
+        ]
 
 
 class PatientStopForm(ModelForm):
     class Meta:
         model = PatientStop
         fields = ["last_dialysis_date", "stop_reason", "dod", "cause_of_death"]
+        widgets = {
+            "last_dialysis_date": DatePickerInput(format="%d/%m/%Y"),
+            "dod": DatePickerInput(format="%d/%m/%Y"),
+        }

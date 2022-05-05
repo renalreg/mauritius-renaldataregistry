@@ -17,7 +17,12 @@
                         <tr class="text-center">
                             <th>Modality</th>
                             <th>Start date</th>
+                            {% if patientkrtmodality_list.first.patient.patientstop%}
+                            <th>Last modality</th>
+                            {% else %}
                             <th>Current modality</th>
+                            {% endif %}
+                            <th colspan="2">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -26,6 +31,10 @@
                             <td>{{patientmodality.get_modality_display}}</td>
                             <td>{{patientmodality.start_date}}</td>
                             <td>{{patientmodality.is_current}}</td>
+                            <td><a href="{% url 'renaldataregistry:PatientModalityDetailView' patientmodality.id %}">View</a></td>
+                            <td><a
+                                href="{% url 'renaldataregistry:PatientModalityUpdateView' patientmodality.id %}">Edit</a>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>

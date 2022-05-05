@@ -2,6 +2,10 @@
 
 {% load patient_list_extras %}
 
+{% block extrahead %}
+{% load static %}
+{% endblock %}
+
 {% block content %}
 <!-- Admin Users -->
 <div class="container">
@@ -30,17 +34,20 @@
             {% endif %}
             <div class="table-responsive">
                 <table class='table table-hover'>
-                    <tr>
-                        <th scope='col'>N.I.C or passport no.</th>
-                        <th scope='col'>Name</th>
-                        <th scope='col'>DOB</th>
-                        <th scope='col'>Gender</th>
-                        <th scope='col'>Health institution</th>
-                        <th scope='col'>Unit</th>
-                        <th colspan="4" scope="colgroup">Actions</th>
-                    </tr>
+                    <thead>
+                        <tr class="text-center">
+                            <th scope='col'>N.I.C or passport no.</th>
+                            <th scope='col'>Name</th>
+                            <th scope='col'>DOB</th>
+                            <th scope='col'>Gender</th>
+                            <th scope='col'>Health institution</th>
+                            <th scope='col'>Unit</th>
+                            <th colspan="6" scope="colgroup">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                     {% for patientregistration in patientregistration_list %}
-                    <tr>
+                    <tr class="text-center">
                         <td>{{patientregistration.patient.pid}}</td>
                         <td>{{patientregistration.patient.name}} {{patientregistration.patient.surname}}</td>
                         <td>{{patientregistration.patient.dob}}</td>
@@ -57,19 +64,34 @@
                         <td>{{patientregistration.unit.first}}</td>
                         {% endif %}
                         <td><a
+                            href="{% url 'renaldataregistry:PatientRecordView' patientregistration.patient.id %}">View
+                            <!-- <img alt="View patient record" src="{% static 'images/view_icon.png' %}" width="30" height="30"> -->
+                        </a>
+                        </td>
+                        <td><a
+                            href="{% url 'renaldataregistry:PatientRegistrationHistoryView' patientregistration.patient.id %}">View hospital history</a>
+                        </td>
+                        <td><a
                                 href="{% url 'renaldataregistry:PatientUpdateView' patientregistration.patient.id %}">Edit</a>
                         </td>
                         <td><a
-                                href="{% url 'renaldataregistry:PatientRegistrationHistoryView' patientregistration.patient.id %}">History</a>
+                            href="{% url 'renaldataregistry:PatientModalityListView' patientregistration.patient.id %}">Start/Change modality</a>
                         </td>
                         <td><a
-                                href="{% url 'renaldataregistry:PatientRecordView' patientregistration.patient.id %}">View</a>
+                            href="{% url 'renaldataregistry:PatientAssessmentListView' patientregistration.patient.id %}">Add assessment</a>
                         </td>
+                        {% if patientregistration.patient.patientstop%}
                         <td><a
-                            href="{% url 'renaldataregistry:PatientModalityListView' patientregistration.patient.id %}">Modality</a>
+                            href="{% url 'renaldataregistry:PatientStopUpdateView' patientregistration.patient.id %}">Edit dialysis stop</a>
                         </td>
+                        {% else %}
+                        <td><a
+                            href="{% url 'renaldataregistry:PatientStopUpdateView' patientregistration.patient.id %}">Stop dialysis</a>
+                        </td>
+                        {% endif %}
                     </tr>
                     {% endfor %}
+                    </tbody>
                 </table>
             </div>
             {% else %}

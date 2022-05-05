@@ -8,8 +8,6 @@ from .models import (
     Comorbidity,
     RenalDiagnosis,
     Disability,
-    LaboratoryParameter,
-    Medication,
     HealthInstitution,
     Unit,
 )
@@ -18,8 +16,6 @@ from .models import (
 admin.site.register(Comorbidity)
 admin.site.register(RenalDiagnosis)
 admin.site.register(Disability)
-admin.site.register(LaboratoryParameter)
-admin.site.register(Medication)
 admin.site.register(HealthInstitution)
 admin.site.register(Unit)
 admin.site.register(PatientRegistration, SimpleHistoryAdmin)

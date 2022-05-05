@@ -117,7 +117,6 @@ class PatientRegistrationFormValidationMixin(ModelForm):
             )
 
         if any(errors):
-            print(errors)
             raise forms.ValidationError(errors)
         return cleaned_data
 
