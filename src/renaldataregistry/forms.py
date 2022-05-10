@@ -21,6 +21,7 @@ from .models import (
     PatientStop,
     PatientLPAssessment,
     PatientMedicationAssessment,
+    PatientDialysisAssessment,
 )
 
 
@@ -99,20 +100,11 @@ class PatientKRTModalityForm(PatientKRTModalityFormValidationMixin):
         model = PatientKRTModality
         fields = [
             "modality",
-            "is_first",
             "is_current",
             "start_date",
             "hd_unit",
             "hd_initialaccess",
-            "hd_sessions",
-            "hd_minssessions",
-            "hd_adequacy_urr",
-            "hd_adequacy_kt",
             "hd_ntcreason",
-            "pd_exchangesday",
-            "pd_fluidlitresday",
-            "pd_adequacy",
-            "pd_bp",
             "before_KRT",
             "ropdorprivnephr_days",
             "hepB_vac",
@@ -147,12 +139,27 @@ class PatientAssessmentForm(ModelForm):
             "hepatitis_b",
             "hepatitis_c",
             "hiv",
-            "posthd_weight",
         ]
         widgets = {
             "comorbidity": forms.CheckboxSelectMultiple,
             "disability": forms.CheckboxSelectMultiple,
         }
+
+
+class PatientAssessmentDialysisForm(ModelForm):
+    class Meta:
+        model = PatientDialysisAssessment
+        fields = [
+            "posthd_weight",
+            "hd_sessions",
+            "hd_minssessions",
+            "hd_adequacy_urr",
+            "hd_adequacy_kt",
+            "pd_exchangesday",
+            "pd_fluidlitresday",
+            "pd_adequacy",
+            "pd_bp",
+        ]
 
 
 class PatientAssessmentLPForm(ModelForm):

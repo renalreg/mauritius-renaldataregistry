@@ -185,16 +185,20 @@
                 </div>
                 <div class="tab">
                     <div class="mb-3">
-                        <h2>Primary renal diagnosis and KRT modality:</h2>
+                        <h2>Renal diagnosis and KRT modality:</h2>
                     </div>
                     <div class="p-3 mb-2 bg-warning text-dark">
                         <p>If the present KRT modality is also the first KRT modality for the patient, please enter the information only in the section for Present KRT modality.</p>
                     </div>
                     <div class="mb-3">
-                        {{patientrenaldiagnosis_form.description | as_crispy_field}}
+                        <p>Primary renal diagnosis</p>
+                        {{ patientrenaldiagnosis_form.renaldiagnosis | as_crispy_field}}
+                        {{ patientrenaldiagnosis_form.description | as_crispy_field}}
                     </div>
                     <div class="mb-3">
-                        {{patientrenaldiagnosis_form.renaldiagnosis | as_crispy_field}}
+                        <p>Secondary renal diagnosis</p>
+                        {{ patientsecondaryrenaldiagnosis_form.renaldiagnosis | as_crispy_field}}
+                        {{ patientsecondaryrenaldiagnosis_form.description | as_crispy_field}}
                     </div>
                     <div class="mb-3">
                         {{patient_form.in_krt_modality | as_crispy_field}}
@@ -213,15 +217,16 @@
                     </div>
                     <p>Give chronology of previous KRT modalities</p>
                     <!-- registration -->
-                    <div class="p-3 mb-2 bg-info text-dark">
-                        <legend>First KRT modality</legend>
-                        <div class="row g-2">
-                            <div class="col-sm">
-                                {{ patientkrtmodality_first_form.modality | as_crispy_field}}
-                            </div>
-                            <div class="col-sm-6">
-                                {{ patientkrtmodality_first_form.start_date | as_crispy_field}}
-                            </div>
+                    <legend>First KRT modality</legend>
+                    <div class="p-3 mb-2 bg-warning text-dark">
+                        <p>Insert modalities from oldest to newest start date</p>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-sm">
+                            {{ patientkrtmodality_first_form.modality | as_crispy_field}}
+                        </div>
+                        <div class="col-sm-6">
+                            {{ patientkrtmodality_first_form.start_date | as_crispy_field}}
                         </div>
                     </div>
                     <div class="row g-2">
@@ -257,7 +262,8 @@
                         </div>
                     </div>
                     <div class="p-3 mb-2 bg-info text-dark" id="current_krt_modality">
-                        <legend>Present KRT modality</legend>
+                        <p>Please not if the patient is in KRT modality but the KRT modality information was inserted using the KRT modality form, it won't be shown here.</p>
+                        <p>If you insert a new patient KRT modality here, this will become the current KRT modality.</p>
                         <div class="row g-2">
                             <div class="col-sm">
                                 {{ patientkrtmodality_present_form.modality | as_crispy_field}}

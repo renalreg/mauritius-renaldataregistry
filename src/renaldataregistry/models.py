@@ -379,7 +379,11 @@ class Disability(models.Model):
 
 
 class PatientRenalDiagnosis(models.Model):
-    patient = models.OneToOneField(Patient, on_delete=models.CASCADE, primary_key=True)
+    patient = models.ForeignKey(
+        "Patient",
+        on_delete=models.CASCADE,
+        verbose_name="Patient",
+    )
     renaldiagnosis = models.ForeignKey(
         "RenalDiagnosis",
         on_delete=models.SET_NULL,
@@ -391,7 +395,11 @@ class PatientRenalDiagnosis(models.Model):
         max_length=300,
         blank=True,
         null=True,
-        verbose_name="Primary renal diagnosis",
+    )
+    is_primary_renaldiagnosis = models.BooleanField(
+        default=False,
+        blank=True,
+        null=True,
     )
 
 
@@ -453,11 +461,6 @@ class PatientKRTModality(models.Model):
         default=1,
         verbose_name="KRT modality",
     )
-    is_first = models.BooleanField(
-        default=False,
-        blank=True,
-        null=True,
-    )
     is_current = models.BooleanField(
         default=False,
         blank=True,
@@ -482,57 +485,11 @@ class PatientKRTModality(models.Model):
         blank=True,
         verbose_name="Access on first HD",
     )
-    hd_sessions = models.PositiveSmallIntegerField(
-        blank=True, null=True, verbose_name="Sessions/week"
-    )
-    hd_minssessions = models.PositiveSmallIntegerField(
-        blank=True, null=True, verbose_name="Mins/session"
-    )
-    hd_adequacy_urr = models.DecimalField(
-        verbose_name="URR %",
-        max_digits=4,
-        decimal_places=2,
-        blank=True,
-        null=True,
-    )
-    hd_adequacy_kt = models.DecimalField(
-        verbose_name="Kt/v",
-        max_digits=5,
-        decimal_places=2,
-        blank=True,
-        null=True,
-    )
     hd_ntcreason = models.PositiveSmallIntegerField(
         choices=NTCREASON_CHOICES,
         default=0,
         blank=True,
         verbose_name="If on NTC, why?",
-    )
-    # if patient in PD:
-    pd_exchangesday = models.PositiveSmallIntegerField(
-        blank=True,
-        null=True,
-    )
-    pd_fluidlitresday = models.DecimalField(
-        verbose_name="Fluid litres/day",
-        max_digits=5,
-        decimal_places=2,
-        blank=True,
-        null=True,
-    )
-    pd_adequacy = models.DecimalField(
-        verbose_name="Kt/V urea",
-        max_digits=5,
-        decimal_places=2,
-        blank=True,
-        null=True,
-    )
-    pd_bp = models.DecimalField(
-        verbose_name="BP in mmHg",
-        max_digits=5,
-        decimal_places=2,
-        blank=True,
-        null=True,
     )
     before_KRT = models.CharField(
         max_length=13,
@@ -544,7 +501,7 @@ class PatientKRTModality(models.Model):
     ropdorprivnephr_days = models.IntegerField(
         null=True,
         blank=True,
-        verbose_name="Time first seen by ROPD or private nephrologist in days before start of KRT:",
+        verbose_name="Time first seen by ROPD or private nephrologist in days before start of KRT",
     )
     hepB_vac = models.CharField(
         max_length=1,
@@ -582,7 +539,7 @@ class PatientKRTModality(models.Model):
         choices=INSERTIONTECHNIQUE_CHOICES,
         default="U",
         blank=True,
-        verbose_name="PD insertion technique:",
+        verbose_name="PD insertion technique",
     )
     created_by = models.ForeignKey(
         CustomUser,
@@ -718,13 +675,6 @@ class PatientAssessment(models.Model):
         default=0,
         verbose_name="HIV",
     )
-    posthd_weight = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
-        blank=True,
-        null=True,
-        verbose_name="Post HD or dry PD weight in kg",
-    )
     created_by = models.ForeignKey(
         CustomUser,
         on_delete=models.SET_NULL,
@@ -741,6 +691,67 @@ class PatientAssessment(models.Model):
         null=True,
     )
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class PatientDialysisAssessment(models.Model):
+    patientassessment = models.OneToOneField(
+        PatientAssessment, on_delete=models.CASCADE, primary_key=True
+    )
+    posthd_weight = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+        verbose_name="Post HD or dry PD weight in kg",
+    )
+    # if patient in hd
+    hd_sessions = models.PositiveSmallIntegerField(
+        blank=True, null=True, verbose_name="Sessions/week"
+    )
+    hd_minssessions = models.PositiveSmallIntegerField(
+        blank=True, null=True, verbose_name="Mins/session"
+    )
+    hd_adequacy_urr = models.DecimalField(
+        verbose_name="URR %",
+        max_digits=4,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+    hd_adequacy_kt = models.DecimalField(
+        verbose_name="Kt/v",
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+    # if patient in pd
+    pd_exchangesday = models.PositiveSmallIntegerField(
+        verbose_name="Exchanges/day",
+        blank=True,
+        null=True,
+    )
+    pd_fluidlitresday = models.DecimalField(
+        verbose_name="Fluid litres/day",
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+    pd_adequacy = models.DecimalField(
+        verbose_name="Kt/V urea",
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+    pd_bp = models.DecimalField(
+        verbose_name="BP in mmHg",
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
 
 
 class PatientLPAssessment(models.Model):
@@ -764,9 +775,7 @@ class PatientLPAssessment(models.Model):
     ferritin = models.DecimalField(
         max_digits=5,
         decimal_places=2,
-        blank=True,
-        null=True,
-        verbose_name="Ferritin ng/ml",
+        verbose_name="Ferritin ng/ml*",
     )
     albumin = models.DecimalField(
         max_digits=5,

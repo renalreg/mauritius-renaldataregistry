@@ -7,9 +7,6 @@
     </div>
     <div class="row justify-content-center">
         <div class="col-10">
-            <div class="p-3 mb-2 bg-warning text-dark">
-                <p>Please note the information presented here is the data entered in the Patient's KRT modality form.</p>
-            </div>
             <div class="table-responsive">
                 <table class="table align-middle">
                     <thead>
@@ -19,6 +16,139 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">Modality </span>{{ patientmodality.get_modality_display }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">HD Unit </span>{{ patientmodality.hd_unit|default_if_none:"--" }}</td>
+                        </tr>
+                        <tr>
+                            <td><span class="fw-bold">{% get_verbose_field_name patientmodality "start_date" %}
+                                </span>{{ patientmodality.start_date }}</td>
+                            <td colspan="3"><span class="fw-bold">Is this the first KRT modality?</span>
+                                {{ is_first_modality }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">Previous modality </span>{{ previouspatientmodality.get_modality_display|default_if_none:"--" }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-center">
+                                <span class="fw-bold">Information if this is the first KRT modality</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <span class="fw-bold">Patient saw it in the year before starting KRT </span>{{ patientmodality.get_before_KRT_display }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <span class="fw-bold">{% get_verbose_field_name patientmodality "ropdorprivnephr_days" %} </span>{{ patientmodality.ropdorprivnephr_days|default_if_none:"--" }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><span class="fw-bold">Last creatinine before KRT
+                                </span>{{ patientakimeasurement.creatinine|default_if_none:"--" }}</td>
+                            <td colspan="2"><span class="fw-bold">Last eGFR before KRT
+                                </span>{{ patientakimeasurement.egfr|default_if_none:"--" }}</td>
+                            <td><span class="fw-bold">Last Hb before KRT
+                                </span>{{ patientakimeasurement.hb|default_if_none:"--" }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">{% get_verbose_field_name patientmodality "hepB_vac" %} </span>{{ patientmodality.hepB_vac }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-center">
+                                <span class="fw-bold">If first KRT modality is dialysis</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">{% get_verbose_field_name patientmodality "delay_start" %} </span>{{ patientmodality.delay_start }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">{% get_verbose_field_name patientmodality "delay_beforedialysis" %} </span>{{ patientmodality.delay_beforedialysis|default_if_none:"--" }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-center">
+                                <span class="fw-bold">If patient starting or transferring to HD</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">{% get_verbose_field_name patientmodality "hd_initialaccess" %} </span>{{ patientmodality.get_hd_initialaccess_display|default_if_none:"--" }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">{% get_verbose_field_name patientmodality "hd_unusedavfavgreason" %} </span>{{ patientmodality.get_hd_unusedavfavgreason_display|default_if_none:"--" }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-center">
+                                <span class="fw-bold">If patient starting or transferring to PD</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">{% get_verbose_field_name patientmodality "pd_catheterdays" %} </span>{{ patientmodality.pd_catheterdays|default_if_none:"--" }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">{% get_verbose_field_name patientmodality "pd_insertiontechnique" %} </span>{{ patientmodality.get_pd_insertiontechnique_display|default_if_none:"--" }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">Comorbidities </span>
+                                {% if patient_assessement %}
+                                {% for comorbidity in patient_assessement.comorbidity.all  %}
+                                <p>{{ comorbidity }}</p>
+                                {% endfor %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">Disabilities </span>
+                                {% if patient_assessement %}
+                                {% for disability in patient_assessement.disability.all  %}
+                                <p>{{ disability }}</p>
+                                {% endfor %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">Smoking status </span>
+                                {% if patient_assessement %}
+                                {{ patient_assessement.get_smokingstatus_display }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">Alcohol disorder </span>
+                                {% if patient_assessement %}
+                                {{ patient_assessement.get_alcoholuse_display }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">Hepatitis B </span>
+                                {% if patient_assessement %}
+                                {{ patient_assessement.get_hepatitis_b_display }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">Hepatitis C </span>
+                                {% if patient_assessement %}
+                                {{ patient_assessement.get_hepatitis_c_display }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">HIV </span>
+                                {% if patient_assessement %}
+                                {{ patient_assessement.get_hiv_display }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">Creation date </span>
+                                {{ patientmodality.created_at }}
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

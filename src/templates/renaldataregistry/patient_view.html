@@ -79,10 +79,18 @@
                                 {{ patient.email|default_if_none:"--" }}, {{ patient.email2|default_if_none:"--" }}
                             </td>
                         </tr>
+                        {% if patient_primaryrenaldiagnosis %}
                         <tr>
-                            <td colspan="2"><span class="fw-bold">Primary renal diagnosis </span>{{ patient.patientrenaldiagnosis.description }}</td>
-                            <td colspan="2"><span class="fw-bold">ERA-EDTA CODE </span>{{ patient.patientrenaldiagnosis.renaldiagnosis }}</td>
+                            <td colspan="2"><span class="fw-bold">Primary renal diagnosis </span>{{ patient_primaryrenaldiagnosis.description }}</td>
+                            <td colspan="2"><span class="fw-bold">ERA-EDTA CODE </span>{{ patient_primaryrenaldiagnosis.renaldiagnosis }}</td>
                         </tr>
+                        {% endif %}
+                        {% if patient_secondaryrenaldiagnosis %}
+                        <tr>
+                            <td colspan="2"><span class="fw-bold">Secondary renal diagnosis </span>{{ patient_secondaryrenaldiagnosis.description }}</td>
+                            <td colspan="2"><span class="fw-bold">ERA-EDTA CODE </span>{{ patient_secondaryrenaldiagnosis.renaldiagnosis }}</td>
+                        </tr>
+                        {% endif %}
                         <tr>
                             <td><span class="fw-bold">{% get_verbose_field_name patient "height" %}
                                 </span>{{ patient.height|default_if_none:"--" }}</td>

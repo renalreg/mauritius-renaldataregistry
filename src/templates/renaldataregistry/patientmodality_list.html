@@ -31,9 +31,14 @@
                             <td>{{patientmodality.get_modality_display}}</td>
                             <td>{{patientmodality.start_date}}</td>
                             <td>{{patientmodality.is_current}}</td>
-                            <td><a href="{% url 'renaldataregistry:PatientModalityDetailView' patientmodality.id %}">View</a></td>
-                            <td><a
-                                href="{% url 'renaldataregistry:PatientModalityUpdateView' patientmodality.id %}">Edit</a>
+                            <td>
+                                <div class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown"></a>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="{% url 'renaldataregistry:PatientModalityDetailView' patientmodality.id %}">View</a>
+                                        <a class="dropdown-item" href="{% url 'renaldataregistry:PatientModalityUpdateView' patientmodality.id %}">Edit</a>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}

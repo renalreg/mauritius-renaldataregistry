@@ -63,32 +63,23 @@
                         {% else %}
                         <td>{{patientregistration.unit.first}}</td>
                         {% endif %}
-                        <td><a
-                            href="{% url 'renaldataregistry:PatientRecordView' patientregistration.patient.id %}">View
-                            <!-- <img alt="View patient record" src="{% static 'images/view_icon.png' %}" width="30" height="30"> -->
-                        </a>
+                        <td>
+                            <div class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown"></a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="{% url 'renaldataregistry:PatientRecordView' patientregistration.patient.id %}">View</a>
+                                    <a class="dropdown-item" href="{% url 'renaldataregistry:PatientRegistrationHistoryView' patientregistration.patient.id %}">View hospital history</a>
+                                    <a class="dropdown-item" href="{% url 'renaldataregistry:PatientUpdateView' patientregistration.patient.id %}">Edit</a>
+                                    <a class="dropdown-item" href="{% url 'renaldataregistry:PatientModalityListView' patientregistration.patient.id %}">Start/Change modality</a>
+                                    <a class="dropdown-item" href="{% url 'renaldataregistry:PatientAssessmentListView' patientregistration.patient.id %}">Add dialysis assessment</a>
+                                    {% if patientregistration.patient.patientstop%}
+                                    <a class="dropdown-item" href="{% url 'renaldataregistry:PatientStopUpdateView' patientregistration.patient.id %}">Edit dialysis stop</a>
+                                    {% else %}
+                                    <a class="dropdown-item" href="{% url 'renaldataregistry:PatientStopUpdateView' patientregistration.patient.id %}">Stop dialysis</a>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </td>
-                        <td><a
-                            href="{% url 'renaldataregistry:PatientRegistrationHistoryView' patientregistration.patient.id %}">View hospital history</a>
-                        </td>
-                        <td><a
-                                href="{% url 'renaldataregistry:PatientUpdateView' patientregistration.patient.id %}">Edit</a>
-                        </td>
-                        <td><a
-                            href="{% url 'renaldataregistry:PatientModalityListView' patientregistration.patient.id %}">Start/Change modality</a>
-                        </td>
-                        <td><a
-                            href="{% url 'renaldataregistry:PatientAssessmentListView' patientregistration.patient.id %}">Add assessment</a>
-                        </td>
-                        {% if patientregistration.patient.patientstop%}
-                        <td><a
-                            href="{% url 'renaldataregistry:PatientStopUpdateView' patientregistration.patient.id %}">Edit dialysis stop</a>
-                        </td>
-                        {% else %}
-                        <td><a
-                            href="{% url 'renaldataregistry:PatientStopUpdateView' patientregistration.patient.id %}">Stop dialysis</a>
-                        </td>
-                        {% endif %}
                     </tr>
                     {% endfor %}
                     </tbody>

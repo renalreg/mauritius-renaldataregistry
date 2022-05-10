@@ -10,14 +10,6 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-{% if patient_form.non_field_errors %}
-<ul>
-    {% for error in patient_form.non_field_errors %}
-    <li>{{ error }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-
 <div class="container">
     <div class="m-5">
         <h1>{{ view_title }}</h1>
@@ -32,7 +24,7 @@
                             <input type="hidden" name="modality" value="{{patient_current_krtmodality.modality}}" />
                     </div>
                     <div class="mb-3">
-                        {{patientassessment_form.posthd_weight | as_crispy_field}}
+                        {{patientassessmentdia_form.posthd_weight | as_crispy_field}}
                     </div>
                     {% if patient_current_krtmodality.modality == 2 %}
                     <!-- modality 2 = HD -->
@@ -43,19 +35,19 @@
                         <span class="fw-bold">HD prescription:</span>
                     </div>
                     <div class="mb-3">
-                        {{patientkrtmodality_form.hd_sessions | as_crispy_field}}
+                        {{patientassessmentdia_form.hd_sessions | as_crispy_field}}
                     </div>
                     <div class="mb-3">
-                        {{patientkrtmodality_form.hd_minssessions | as_crispy_field}}
+                        {{patientassessmentdia_form.hd_minssessions | as_crispy_field}}
                     </div>
                     <div class="mb-3">
                         <span class="fw-bold">HD adequacy:</span>
                     </div>
                     <div class="mb-3">
-                        {{patientkrtmodality_form.hd_adequacy_urr | as_crispy_field}}
+                        {{patientassessmentdia_form.hd_adequacy_urr | as_crispy_field}}
                     </div>
                     <div class="mb-3">
-                        {{patientkrtmodality_form.hd_adequacy_kt | as_crispy_field}}
+                        {{patientassessmentdia_form.hd_adequacy_kt | as_crispy_field}}
                     </div>
                     <div class="mb-3">
                         {{patientkrtmodality_form.hd_initialaccess | as_crispy_field}}
@@ -67,16 +59,16 @@
                     {% if patient_current_krtmodality.modality == 3 %}
                     <!-- modality 3 = PD -->
                     <div class="mb-3">
-                        {{patientkrtmodality_form.pd_exchangesday | as_crispy_field}}
+                        {{patientassessmentdia_form.pd_exchangesday | as_crispy_field}}
                     </div>
                     <div class="mb-3">
-                        {{patientkrtmodality_form.pd_fluidlitresday | as_crispy_field}}
+                        {{patientassessmentdia_form.pd_fluidlitresday | as_crispy_field}}
                     </div>
                     <div class="mb-3">
-                        {{patientkrtmodality_form.pd_adequacy | as_crispy_field}}
+                        {{patientassessmentdia_form.pd_adequacy | as_crispy_field}}
                     </div>
                     <div class="mb-3">
-                        {{patientkrtmodality_form.pd_bp | as_crispy_field}}
+                        {{patientassessmentdia_form.pd_bp | as_crispy_field}}
                     </div>
                     {% endif %}
                 </div>

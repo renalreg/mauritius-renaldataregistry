@@ -6,7 +6,7 @@
         <h1>Patient dialysis assessments</h1>
     </div>
     <div class="row justify-content-center">
-        {% if patient_in_dialysis and not patient.patientstop%}
+        {% if patient_in_dialysis %}
         <div class="col-10 d-flex justify-content-center">
             <a href="{% url 'renaldataregistry:PatientAssessmentView' patient.id %}" class="link-primary">New dialysis assessment</a>
         </div>
@@ -25,9 +25,14 @@
                         {% for patientassessment in patientassessment_list %}
                         <tr>
                             <td>{{patientassessment.created_at}}</td>
-                            <td><a href="{% url 'renaldataregistry:PatientAssessmentDetailView' patientassessment.id %}">View</a></td>
-                            <td><a
-                                href="{% url 'renaldataregistry:PatientAssessmentUpdateView' patientassessment.id %}">Edit</a>
+                            <td>
+                                <div class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown"></a>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="{% url 'renaldataregistry:PatientAssessmentDetailView' patientassessment.id %}">View</a>
+                                        <a class="dropdown-item" href="{% url 'renaldataregistry:PatientAssessmentUpdateView' patientassessment.id %}">Edit</a>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
@@ -37,7 +42,7 @@
             {% else %}
             <p>There are no records.</p>
             {% if not patient_in_dialysis %}
-            <p>Note: The patient should be in dialysis to register a new assessment.</p>
+            <p>Note: The patient should be in dialysis to register a new dialysis assessment.</p>
             {% endif %}
             {% endif %}
         </div>
