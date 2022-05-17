@@ -23,10 +23,8 @@ class PatientFormValidationMixin(ModelForm):
         weight = cleaned_data.get("weight")
         birth_weight = cleaned_data.get("birth_weight")
         postcode = cleaned_data.get("postcode")
-        landline_number1 = cleaned_data.get("landline_number1")
-        landline_number2 = cleaned_data.get("landline_number2")
-        mobile_number1 = cleaned_data.get("mobile_number1")
-        mobile_number2 = cleaned_data.get("mobile_number2")
+        landline_number = cleaned_data.get("landline_number")
+        mobile_number = cleaned_data.get("mobile_number")
         email = cleaned_data.get("email")
         email2 = cleaned_data.get("email2")
 
@@ -67,24 +65,14 @@ class PatientFormValidationMixin(ModelForm):
             if not POSTCODE_PATTERN.match(postcode):
                 errors.append("Postcode must be 5 digits.")
 
-        if landline_number1 is not None:
+        if landline_number is not None:
             # Landline, 7 digits. No area codes.
-            if len(landline_number1) != 7 or not landline_number1.isnumeric():
+            if len(landline_number) != 7 or not landline_number.isnumeric():
                 errors.append("Landline number is 7 digits.")
 
-        if landline_number2 is not None:
-            # Landline, 7 digits. No area codes.
-            if len(landline_number2) != 7 or not landline_number2.isnumeric():
-                errors.append("Landline number is 7 digits.")
-
-        if mobile_number1 is not None:
+        if mobile_number is not None:
             # Mobile, 8 digits. No area codes.
-            if len(mobile_number1) != 8 or not mobile_number1.isnumeric():
-                errors.append("Mobile number is 8 digits.")
-
-        if mobile_number2 is not None:
-            # Mobile, 8 digits. No area codes.
-            if len(mobile_number2) != 8 or not mobile_number2.isnumeric():
+            if len(mobile_number) != 8 or not mobile_number.isnumeric():
                 errors.append("Mobile number is 8 digits.")
 
         if email is not None:

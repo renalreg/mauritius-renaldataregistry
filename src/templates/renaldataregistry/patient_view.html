@@ -65,10 +65,9 @@
                             <td><span class="fw-bold">{% get_verbose_field_name patient "pid" %}
                                 </span>{{ patient.pid }}</td>
                             <td colspan="3"><span class="fw-bold">Phone Nos</span>
-                                {{ patient.landline_number1|default_if_none:"--" }},
-                                {{ patient.landline_number2|default_if_none:"--" }},
-                                {{ patient.mobile_number1|default_if_none:"--" }},
-                                {{ patient.mobile_number2|default_if_none:"--" }}
+                                {{ patient.landline_number|default_if_none:"--" }},
+                                {{ patient.mobile_number|default_if_none:"--" }},
+                                {{ patient.alternative_numbers|default_if_none:"--" }}
                             </td>
                         </tr>
                         <tr>

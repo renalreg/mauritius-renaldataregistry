@@ -103,7 +103,7 @@ class Patient(models.Model):
         null=True,
     )
     street = models.CharField(
-        max_length=200, verbose_name="Street", null=True, blank=True
+        max_length=200, verbose_name="Address", null=True, blank=True
     )
     postcode = models.CharField(
         max_length=5, verbose_name="Postcode", null=True, blank=True
@@ -144,17 +144,14 @@ class Patient(models.Model):
         default="N",
         verbose_name="Is patient on Kidney Replacement Therapy (KRT)?",
     )
-    landline_number1 = models.CharField(
+    landline_number = models.CharField(
         max_length=7, null=True, blank=True, verbose_name="Home phone number"
     )
-    landline_number2 = models.CharField(
-        max_length=7, null=True, blank=True, verbose_name="Alternative landline number"
-    )
-    mobile_number1 = models.CharField(
+    mobile_number = models.CharField(
         max_length=8, null=True, blank=True, verbose_name="Mobile phone number"
     )
-    mobile_number2 = models.CharField(
-        max_length=8, null=True, blank=True, verbose_name="Alternative mobile number"
+    alternative_numbers = models.CharField(
+        max_length=100, null=True, blank=True, verbose_name="Alternative numbers"
     )
     email = models.CharField(
         max_length=100, blank=True, null=True, verbose_name="Email"
@@ -190,7 +187,7 @@ class PatientRegistration(models.Model):
     unit = models.ManyToManyField(
         "Unit",
         blank=True,
-        verbose_name="Unit",
+        verbose_name="Unit number/s",
     )
     created_by = models.ForeignKey(
         CustomUser,
@@ -251,7 +248,7 @@ class HealthInstitution(models.Model):
 
 
 class Unit(models.Model):
-    number = models.CharField(max_length=8, unique=True)
+    number = models.CharField(max_length=6, unique=True)
     name = models.CharField(max_length=100)
     healthinstitution = models.ForeignKey(
         "HealthInstitution",
@@ -475,7 +472,7 @@ class PatientKRTModality(models.Model):
     hd_unit = models.ForeignKey(
         "HDUnit",
         on_delete=models.SET_NULL,
-        verbose_name="If HD, state unit",
+        verbose_name="If HD, state HD unit",
         blank=True,
         null=True,
     )

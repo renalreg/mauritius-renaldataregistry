@@ -74,10 +74,9 @@ class PatientForm(PatientFormValidationMixin):
             "prev_occupation3",
             "prev_occupation4",
             "in_krt_modality",
-            "landline_number1",
-            "landline_number2",
-            "mobile_number1",
-            "mobile_number2",
+            "landline_number",
+            "mobile_number",
+            "alternative_numbers",
             "email",
             "email2",
         ]

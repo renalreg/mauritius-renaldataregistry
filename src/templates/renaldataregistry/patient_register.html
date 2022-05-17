@@ -101,6 +101,7 @@
                     </div>
                     <div class="mb-3">
                         {{patient_form.pid | as_crispy_field}}
+                        <a href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="NIC No. is 1 letter followed by DDMMYY digits of date of birth followed by 6 digits then one alphanumeric symbol (14 characters). Passport number is 13 characters long, all alphanumeric."><i class="bi bi-info-circle"></i></a>
                     </div>
                     <div class="mb-3">
                         {{patientregistration_form.health_institution | as_crispy_field}}
@@ -124,19 +125,19 @@
                         {{patient_form.postcode | as_crispy_field}}
                     </div>
                     <div class="mb-3">
+                        <a href="https://www.mauritiuspost.mu/products-and-services/post-code-and-zip-code-finder" target="_blank">Link to postcode searcher</a>
+                    </div>
+                    <div class="mb-3">
                         {{patient_form.street | as_crispy_field}}
                     </div>
                     <div class="mb-3">
-                        {{patient_form.landline_number1 | as_crispy_field}}
+                        {{patient_form.landline_number | as_crispy_field}}
                     </div>
                     <div class="mb-3">
-                        {{patient_form.landline_number2 | as_crispy_field}}
+                        {{patient_form.mobile_number | as_crispy_field}}
                     </div>
                     <div class="mb-3">
-                        {{patient_form.mobile_number1 | as_crispy_field}}
-                    </div>
-                    <div class="mb-3">
-                        {{patient_form.mobile_number2 | as_crispy_field}}
+                        {{patient_form.alternative_numbers | as_crispy_field}}
                     </div>
                     <div class="mb-3">
                         {{patient_form.email | as_crispy_field}}
@@ -201,6 +202,9 @@
                         {{ patientsecondaryrenaldiagnosis_form.description | as_crispy_field}}
                     </div>
                     <div class="mb-3">
+                        <a href="https://www.era-edta-reg.org/prd.jsp" target="_blank">Link to ERA-EDTA code site</a>
+                    </div>
+                    <div class="mb-3">
                         {{patient_form.in_krt_modality | as_crispy_field}}
                     </div>
                     <div class="mb-3">
@@ -217,10 +221,10 @@
                     </div>
                     <p>Give chronology of previous KRT modalities</p>
                     <!-- registration -->
-                    <legend>First KRT modality</legend>
                     <div class="p-3 mb-2 bg-warning text-dark">
                         <p>Insert modalities from oldest to newest start date</p>
                     </div>
+                    <legend>Previous KRT Modalities</legend>
                     <div class="row g-2">
                         <div class="col-sm">
                             {{ patientkrtmodality_first_form.modality | as_crispy_field}}
@@ -262,6 +266,7 @@
                         </div>
                     </div>
                     <div class="p-3 mb-2 bg-info text-dark" id="current_krt_modality">
+                        <legend>Present KRT modality</legend>
                         <p>Please not if the patient is in KRT modality but the KRT modality information was inserted using the KRT modality form, it won't be shown here.</p>
                         <p>If you insert a new patient KRT modality here, this will become the current KRT modality.</p>
                         <div class="row g-2">
