@@ -3,8 +3,6 @@
 import django.core.validators
 from django.db import migrations, models
 
-# pylint: disable=invalid-name
-
 
 class Migration(migrations.Migration):
 
