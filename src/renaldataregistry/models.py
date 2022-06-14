@@ -1,4 +1,5 @@
 from simple_history.models import HistoricalRecords
+from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
 from django.db import models
 from users.models import CustomUser
 
@@ -184,10 +185,26 @@ class PatientRegistration(models.Model):
         on_delete=models.CASCADE,
         verbose_name="Health institution",
     )
-    unit = models.ManyToManyField(
-        "Unit",
+    unit_no1 = models.CharField(
+        verbose_name="Unit number 1",
         blank=True,
-        verbose_name="Unit number/s",
+        null=True,
+        max_length=6,
+        validators=[RegexValidator(r"^\d{1,10}$")],
+    )
+    unit_no2 = models.CharField(
+        verbose_name="Unit number 2",
+        blank=True,
+        null=True,
+        max_length=6,
+        validators=[RegexValidator(r"^\d{1,10}$")],
+    )
+    unit_no3 = models.CharField(
+        verbose_name="Unit number 3",
+        blank=True,
+        null=True,
+        max_length=6,
+        validators=[RegexValidator(r"^\d{1,10}$")],
     )
     created_by = models.ForeignKey(
         CustomUser,
@@ -247,35 +264,6 @@ class HealthInstitution(models.Model):
         return self.name
 
 
-class Unit(models.Model):
-    number = models.CharField(max_length=6, unique=True)
-    name = models.CharField(max_length=100)
-    healthinstitution = models.ForeignKey(
-        "HealthInstitution",
-        on_delete=models.CASCADE,
-        verbose_name="Health institution",
-    )
-    created_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="u_created_by",
-        blank=True,
-        null=True,
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="u_updated_by",
-        blank=True,
-        null=True,
-    )
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.name + " (" + str(self.number) + ")"
-
-
 class HDUnit(models.Model):
     code = models.CharField(max_length=3, unique=True)
     name = models.CharField(max_length=100, unique=True)
@@ -298,35 +286,6 @@ class HDUnit(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class RenalDiagnosis(models.Model):
-    # code: ERA-EDTA CODE (4 digits code)
-    code = models.PositiveSmallIntegerField(unique=True)
-    name = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True,
-    )
-    created_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="rd_created_by",
-        blank=True,
-        null=True,
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_by = models.ForeignKey(
-        CustomUser,
-        on_delete=models.SET_NULL,
-        related_name="rd_updated_by",
-        blank=True,
-        null=True,
-    )
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.name + " (" + str(self.code) + ")"
 
 
 class Comorbidity(models.Model):
@@ -381,12 +340,12 @@ class PatientRenalDiagnosis(models.Model):
         on_delete=models.CASCADE,
         verbose_name="Patient",
     )
-    renaldiagnosis = models.ForeignKey(
-        "RenalDiagnosis",
-        on_delete=models.SET_NULL,
+    code = models.CharField(
         verbose_name="ERA-EDTA CODE",
         blank=True,
         null=True,
+        max_length=4,
+        validators=[RegexValidator(r"^\d{1,10}$")],
     )
     description = models.CharField(
         max_length=300,
@@ -476,17 +435,17 @@ class PatientKRTModality(models.Model):
         blank=True,
         null=True,
     )
+    # hd_initialaccess is Access on first HD in KRT modality form and Access used for last dialysis in the Dialysis Assessment form
     hd_initialaccess = models.PositiveSmallIntegerField(
         choices=INITIALACCESS_CHOICES,
         default=0,
         blank=True,
-        verbose_name="Access on first HD",
     )
-    hd_ntcreason = models.PositiveSmallIntegerField(
+    hd_tc_ntc_reason = models.PositiveSmallIntegerField(
         choices=NTCREASON_CHOICES,
         default=0,
         blank=True,
-        verbose_name="If on NTC, why?",
+        verbose_name="If on TC or NTC, why?",
     )
     before_KRT = models.CharField(
         max_length=13,
@@ -525,6 +484,14 @@ class PatientKRTModality(models.Model):
         default="U",
         blank=True,
         verbose_name="Why AVF/AVG not used to initiate HD?",
+    )
+    hd_privatestart = models.CharField(
+        max_length=1,
+        choices=Y_N_CHOICES,
+        default="U",
+        blank=True,
+        null=True,
+        verbose_name="Was HD started in private?",
     )
     pd_catheterdays = models.IntegerField(
         null=True,
@@ -651,6 +618,12 @@ class PatientAssessment(models.Model):
         choices=SMOKINGSTATUS_CHOICES,
         default=0,
         verbose_name="Smoking status",
+    )
+    clinical_frailty = models.PositiveIntegerField(
+        verbose_name="Clinical frailty scale (1 to 9)",
+        blank=True,
+        null=True,
+        validators=[MinValueValidator(1), MaxValueValidator(9)],
     )
     alcoholuse = models.PositiveSmallIntegerField(
         choices=ALCOHOLUSE_CHOICES,
@@ -816,9 +789,10 @@ class PatientLPAssessment(models.Model):
 
 
 class PatientMedicationAssessment(models.Model):
-    Y_N_CHOICES = (
+    Y_N_U_CHOICES = (
         ("Y", "Yes"),
         ("N", "No"),
+        ("U", "Unknown"),
     )
     patientassessment = models.OneToOneField(
         PatientAssessment, on_delete=models.CASCADE, primary_key=True
@@ -851,101 +825,133 @@ class PatientMedicationAssessment(models.Model):
         null=True,
         verbose_name="mg/month",
     )
+    # Anti-diabetics
     insulin = models.CharField(
         max_length=1,
-        choices=Y_N_CHOICES,
-        default="N",
+        choices=Y_N_U_CHOICES,
+        default="U",
         verbose_name="Insulin",
     )
     sulphonylureas = models.CharField(
         max_length=1,
-        choices=Y_N_CHOICES,
-        default="N",
+        choices=Y_N_U_CHOICES,
+        default="U",
         verbose_name="Sulphonylureas",
     )
-    antidiab_others1 = models.CharField(
-        max_length=50,
-        verbose_name="1",
-        blank=True,
-        null=True,
+    dpp4i = models.CharField(
+        max_length=1,
+        choices=Y_N_U_CHOICES,
+        default="U",
+        verbose_name="DPP4i",
     )
-    antidiab_others2 = models.CharField(
-        max_length=50,
-        verbose_name="2",
-        blank=True,
-        null=True,
+    glp1a = models.CharField(
+        max_length=1,
+        choices=Y_N_U_CHOICES,
+        default="U",
+        verbose_name="GLP1A",
     )
-    antidiab_others3 = models.CharField(
-        max_length=50,
-        verbose_name="3",
-        blank=True,
-        null=True,
+    meglitinides = models.CharField(
+        max_length=1,
+        choices=Y_N_U_CHOICES,
+        default="U",
+        verbose_name="Meglitinides",
     )
+    sglt2i = models.CharField(
+        max_length=1,
+        choices=Y_N_U_CHOICES,
+        default="U",
+        verbose_name="SGLT2i",
+    )
+    acarbose = models.CharField(
+        max_length=1,
+        choices=Y_N_U_CHOICES,
+        default="U",
+        verbose_name="Acarbose",
+    )
+    metformin = models.CharField(
+        max_length=1,
+        choices=Y_N_U_CHOICES,
+        default="U",
+        verbose_name="Metformin",
+    )
+    antidiabetic_other = models.CharField(
+        max_length=1,
+        choices=Y_N_U_CHOICES,
+        default="U",
+        verbose_name="Other",
+    )
+    # BP Drugs
     acei = models.CharField(
         max_length=1,
-        choices=Y_N_CHOICES,
-        default="N",
+        choices=Y_N_U_CHOICES,
+        default="U",
         verbose_name="ACEi",
     )
     arb = models.CharField(
         max_length=1,
-        choices=Y_N_CHOICES,
-        default="N",
+        choices=Y_N_U_CHOICES,
+        default="U",
         verbose_name="ARB",
     )
     cc_blocker = models.CharField(
         max_length=1,
-        choices=Y_N_CHOICES,
-        default="N",
+        choices=Y_N_U_CHOICES,
+        default="U",
         verbose_name="CC Blocker",
     )
     beta_blocker = models.CharField(
         max_length=1,
-        choices=Y_N_CHOICES,
-        default="N",
+        choices=Y_N_U_CHOICES,
+        default="U",
         verbose_name="Beta Blocker",
     )
     alpha_blocker = models.CharField(
         max_length=1,
-        choices=Y_N_CHOICES,
-        default="N",
+        choices=Y_N_U_CHOICES,
+        default="U",
         verbose_name="Alpha Blocker",
     )
-    methyldopa = models.CharField(
+    centrally_acting = models.CharField(
         max_length=1,
-        choices=Y_N_CHOICES,
-        default="N",
-        verbose_name="Methyldopa",
+        choices=Y_N_U_CHOICES,
+        default="U",
+        verbose_name="Centrally acting",
     )
-    antihypertensives_others1 = models.CharField(
-        max_length=50,
-        verbose_name="1",
-        blank=True,
-        null=True,
+    p_vasodilators = models.CharField(
+        max_length=1,
+        choices=Y_N_U_CHOICES,
+        default="U",
+        verbose_name="P Vasodilators",
     )
-    antihypertensives_others2 = models.CharField(
-        max_length=50,
-        verbose_name="2",
-        blank=True,
-        null=True,
+    loop_diuretics = models.CharField(
+        max_length=1,
+        choices=Y_N_U_CHOICES,
+        default="U",
+        verbose_name="Loop diuretics",
     )
-    antihypertensives_others3 = models.CharField(
-        max_length=50,
-        verbose_name="3",
-        blank=True,
-        null=True,
+    mra = models.CharField(
+        max_length=1,
+        choices=Y_N_U_CHOICES,
+        default="U",
+        verbose_name="MRA",
     )
-    antihypertensives_others4 = models.CharField(
-        max_length=50,
-        verbose_name="4",
-        blank=True,
-        null=True,
+    thiazides = models.CharField(
+        max_length=1,
+        choices=Y_N_U_CHOICES,
+        default="U",
+        verbose_name="Thiazides",
     )
-    antihypertensives_others5 = models.CharField(
-        max_length=50,
-        verbose_name="5",
-        blank=True,
-        null=True,
+    renin_inhibitors = models.CharField(
+        max_length=1,
+        choices=Y_N_U_CHOICES,
+        default="U",
+        verbose_name="Renin Inhibitors",
+    )
+    bpdrugs_others = models.CharField(
+        max_length=1,
+        choices=Y_N_U_CHOICES,
+        default="U",
+        verbose_name="Others",
     )
 
     class Meta:

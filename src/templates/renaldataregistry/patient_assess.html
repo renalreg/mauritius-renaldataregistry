@@ -50,10 +50,11 @@
                         {{patientassessmentdia_form.hd_adequacy_kt | as_crispy_field}}
                     </div>
                     <div class="mb-3">
+                        <label for="id_hd_initialaccess">Access used for last dialysis</label>
                         {{patientkrtmodality_form.hd_initialaccess | as_crispy_field}}
                     </div>
                     <div class="mb-3">
-                        {{patientkrtmodality_form.hd_ntcreason | as_crispy_field}}
+                        {{patientkrtmodality_form.hd_tc_ntc_reason | as_crispy_field}}
                     </div>
                     {% endif %}
                     {% if patient_current_krtmodality.modality == 3 %}
@@ -86,7 +87,91 @@
                         <h2>Medications:</h2>
                     </div>
                     <div class="mb-3">
-                        {{patientassessmentmed_form}}
+                        <p class="fw-bold">ESA dose</p>
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.iu_wk | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.mcg2 | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.mcg4 | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        <p class="fw-bold">IV iron dose</p>
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.mg | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        <p class="fw-bold">Anti-diabetics</p>
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.insulin | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.sulphonylureas | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.dpp4i | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.glp1a | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.meglitinides | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.sglt2i | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.acarbose | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.metformin | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.antidiabetic_other | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        <p class="fw-bold">BP Drugs</p>
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.acei | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.arb | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.cc_blocker | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.beta_blocker | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.alpha_blocker | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.centrally_acting | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.p_vasodilators | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.loop_diuretics | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.mra | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.thiazides | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.renin_inhibitors | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessmentmed_form.bpdrugs_others | as_crispy_field}}
                     </div>
                 </div>
                 <div class="tab">
@@ -96,6 +181,9 @@
                     </div>
                     <div class="mb-3">
                         {{patientassessment_form.disability | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessment_form.clinical_frailty | as_crispy_field}}
                     </div>
                     <div class="mb-3">
                         {{patientassessment_form.smokingstatus | as_crispy_field}}

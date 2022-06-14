@@ -1,5 +1,4 @@
 from django.urls import path
-from . import views
 
 from .views import (
     PatientRegistrationListView,
@@ -38,7 +37,6 @@ urlpatterns = [
         PatientRegistrationHistoryView.as_view(),
         name="PatientRegistrationHistoryView",
     ),
-    path("load-units/", views.load_units, name="load-units"),
     path(
         "patient/<pk>/view/",
         PatientView.as_view(),

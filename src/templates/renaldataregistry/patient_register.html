@@ -89,8 +89,7 @@
     </div>
     <div class="row justify-content-center">
         <div class="col-5">
-            <form class="" id="mrr_form" action="" method="post"
-                data-units-url="{% url 'renaldataregistry:load-units' %}">
+            <form class="" id="mrr_form" action="" method="post">
                 {% csrf_token %}
                 <div class="tab">
                     <div class="mb-3">
@@ -107,13 +106,22 @@
                         {{patientregistration_form.health_institution | as_crispy_field}}
                     </div>
                     <div class="mb-3">
-                        {{patientregistration_form.unit | as_crispy_field}}
+                        {{patientregistration_form.unit_no1 | as_crispy_field}}
+                        <a href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="Unit number is a 6 digit number."><i class="bi bi-info-circle"></i></a>
                     </div>
                     <div class="mb-3">
-                        {{patient_form.name | as_crispy_field}}
+                        {{patientregistration_form.unit_no2 | as_crispy_field}}
+                        <a href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="Unit number is a 6 digit number."><i class="bi bi-info-circle"></i></a>
+                    </div>
+                    <div class="mb-3">
+                        {{patientregistration_form.unit_no3 | as_crispy_field}}
+                        <a href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="Unit number is a 6 digit number."><i class="bi bi-info-circle"></i></a>
                     </div>
                     <div class="mb-3">
                         {{patient_form.surname | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patient_form.name | as_crispy_field}}
                     </div>
                     <div class="mb-3">
                         {{patient_form.dob | as_crispy_field}}
@@ -193,12 +201,12 @@
                     </div>
                     <div class="mb-3">
                         <p>Primary renal diagnosis</p>
-                        {{ patientrenaldiagnosis_form.renaldiagnosis | as_crispy_field}}
+                        {{ patientrenaldiagnosis_form.code | as_crispy_field}}
                         {{ patientrenaldiagnosis_form.description | as_crispy_field}}
                     </div>
                     <div class="mb-3">
                         <p>Secondary renal diagnosis</p>
-                        {{ patientsecondaryrenaldiagnosis_form.renaldiagnosis | as_crispy_field}}
+                        {{ patientsecondaryrenaldiagnosis_form.code | as_crispy_field}}
                         {{ patientsecondaryrenaldiagnosis_form.description | as_crispy_field}}
                     </div>
                     <div class="mb-3">
@@ -291,6 +299,9 @@
                     </div>
                     <div class="mb-3">
                         {{patientassessment_form.disability | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessment_form.clinical_frailty | as_crispy_field}}
                     </div>
                     <div class="mb-3">
                         {{patientassessment_form.smokingstatus | as_crispy_field}}

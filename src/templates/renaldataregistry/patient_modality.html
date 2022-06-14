@@ -80,10 +80,14 @@
                     </div>
                     {% endif %}
                     <div class="mb-3">
+                        <label for="id_hd_initialaccess">Access on first HD</label>
                         {{patientkrtmodality_form.hd_initialaccess | as_crispy_field}}
                     </div>
                     <div class="mb-3">
                         {{patientkrtmodality_form.hd_unusedavfavgreason | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientkrtmodality_form.hd_privatestart | as_crispy_field}}
                     </div>
                     <div class="mb-3">
                         {{patientkrtmodality_form.pd_catheterdays | as_crispy_field}}
@@ -101,6 +105,9 @@
                     </div>
                     <div class="mb-3">
                         {{patientassessment_form.disability | as_crispy_field}}
+                    </div>
+                    <div class="mb-3">
+                        {{patientassessment_form.clinical_frailty | as_crispy_field}}
                     </div>
                     <div class="mb-3">
                         {{patientassessment_form.smokingstatus | as_crispy_field}}

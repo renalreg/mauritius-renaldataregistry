@@ -11,7 +11,6 @@ from utils.mixin import (
     PatientKRTModalityFormValidationMixin,
 )
 from .models import (
-    Unit,
     PatientRegistration,
     Patient,
     PatientRenalDiagnosis,
@@ -28,26 +27,7 @@ from .models import (
 class PatientRegistrationForm(PatientRegistrationFormValidationMixin):
     class Meta:
         model = PatientRegistration
-        fields = ["health_institution", "unit"]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["unit"].queryset = Unit.objects.none()
-
-        if "health_institution" in self.data:
-            # post data
-            try:
-                hi_id = int(self.data.get("health_institution"))
-                self.fields["unit"].queryset = Unit.objects.filter(
-                    healthinstitution=hi_id
-                ).order_by("name")
-            except (ValueError, TypeError):
-                pass
-        elif self.instance.pk:
-            # Get units from linked to the registered hi
-            self.fields[
-                "unit"
-            ].queryset = self.instance.health_institution.unit_set.order_by("name")
+        fields = ["health_institution", "unit_no1", "unit_no2", "unit_no3"]
 
 
 class PatientForm(PatientFormValidationMixin):
@@ -88,7 +68,7 @@ class PatientForm(PatientFormValidationMixin):
 class PatientRenalDiagnosisForm(ModelForm):
     class Meta:
         model = PatientRenalDiagnosis
-        fields = ["description", "renaldiagnosis"]
+        fields = ["code", "description"]
         widgets = {
             "description": Textarea(attrs={"cols": 20, "rows": 5}),
         }
@@ -103,19 +83,22 @@ class PatientKRTModalityForm(PatientKRTModalityFormValidationMixin):
             "start_date",
             "hd_unit",
             "hd_initialaccess",
-            "hd_ntcreason",
+            "hd_tc_ntc_reason",
             "before_KRT",
             "ropdorprivnephr_days",
             "hepB_vac",
             "delay_start",
             "delay_beforedialysis",
             "hd_unusedavfavgreason",
+            "hd_privatestart",
             "pd_catheterdays",
             "pd_insertiontechnique",
         ]
         widgets = {
             "start_date": DatePickerInput(format="%d/%m/%Y"),
         }
+        # Remove label in order to set one when an HD modality is registered (in this case, the label is Access on first HD) and one when the patient is assessed (in this case, the label is Access used for last dialysis)
+        labels = {"hd_initialaccess": ""}
 
 
 class PatientAKIMeasurementForm(PatientAKIMeasurementFormValidationMixin):
@@ -133,6 +116,7 @@ class PatientAssessmentForm(ModelForm):
         fields = [
             "comorbidity",
             "disability",
+            "clinical_frailty",
             "smokingstatus",
             "alcoholuse",
             "hepatitis_b",
@@ -187,20 +171,25 @@ class PatientAssessmentMedicationForm(ModelForm):
             "mg",
             "insulin",
             "sulphonylureas",
-            "antidiab_others1",
-            "antidiab_others2",
-            "antidiab_others3",
+            "dpp4i",
+            "glp1a",
+            "meglitinides",
+            "sglt2i",
+            "acarbose",
+            "metformin",
+            "antidiabetic_other",
             "acei",
             "arb",
             "cc_blocker",
             "beta_blocker",
             "alpha_blocker",
-            "methyldopa",
-            "antihypertensives_others1",
-            "antihypertensives_others2",
-            "antihypertensives_others3",
-            "antihypertensives_others4",
-            "antihypertensives_others5",
+            "centrally_acting",
+            "p_vasodilators",
+            "loop_diuretics",
+            "mra",
+            "thiazides",
+            "renin_inhibitors",
+            "bpdrugs_others",
         ]
 
 

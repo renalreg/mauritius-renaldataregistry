@@ -14,9 +14,11 @@ $(document).ready(function () {
     if (modality == 2) {
         $("#div_id_hd_unit").show();
         $("#div_id_hd_initialaccess").show();
+        $("#div_id_hd_privatestart").show();
     } else {
         $("#div_id_hd_unit").hide();
         $("#div_id_hd_initialaccess").hide();
+        $("#div_id_hd_privatestart").hide();
     }
 
     // PD modality is 3
@@ -56,12 +58,16 @@ $(document).ready(function () {
         if (modality == 2) {
             $("#div_id_hd_unit").show();
             $("#div_id_hd_initialaccess").show();
+            $("#div_id_hd_privatestart").show();
         } else {
             $("#div_id_hd_unit").val('');
             $("#div_id_hd_unit").hide();
 
             $("#div_id_hd_initialaccess").val('');
             $("#div_id_hd_initialaccess").hide();
+            
+            $("#div_id_hd_privatestart").val('');
+            $("#div_id_hd_privatestart").hide();
         }
 
         // PD

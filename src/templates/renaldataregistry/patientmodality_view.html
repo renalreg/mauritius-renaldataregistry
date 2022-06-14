@@ -75,10 +75,13 @@
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="4"><span class="fw-bold">{% get_verbose_field_name patientmodality "hd_initialaccess" %} </span>{{ patientmodality.get_hd_initialaccess_display|default_if_none:"--" }}</td>
+                            <td colspan="4"><span class="fw-bold">Access on first HD </span>{{ patientmodality.get_hd_initialaccess_display|default_if_none:"--" }}</td>
                         </tr>
                         <tr>
                             <td colspan="4"><span class="fw-bold">{% get_verbose_field_name patientmodality "hd_unusedavfavgreason" %} </span>{{ patientmodality.get_hd_unusedavfavgreason_display|default_if_none:"--" }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">{% get_verbose_field_name patientmodality "hd_privatestart" %} </span>{{ patientmodality.get_hd_privatestart_display|default_if_none:"--" }}</td>
                         </tr>
                         <tr>
                             <td colspan="4" class="text-center">
@@ -106,6 +109,13 @@
                                 {% for disability in patient_assessement.disability.all  %}
                                 <p>{{ disability }}</p>
                                 {% endfor %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">Clinical frailty scale (1 to 9) </span>
+                                {% if patient_assessement %}
+                                {{ patient_assessement.clinical_frailty }}
                                 {% endif %}
                             </td>
                         </tr>

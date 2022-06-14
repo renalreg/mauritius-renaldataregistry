@@ -97,9 +97,11 @@ class PatientRegistrationFormValidationMixin(ModelForm):
 
         health_institution = cleaned_data.get("health_institution")
         is_unit_required = health_institution.is_unit_required
-        unit = cleaned_data.get("unit")
+        unit_no1 = cleaned_data.get("unit_no1")
+        unit_no2 = cleaned_data.get("unit_no2")
+        unit_no3 = cleaned_data.get("unit_no3")
 
-        if is_unit_required and not unit:
+        if is_unit_required and not (unit_no1 or unit_no2 or unit_no3):
             errors.append(
                 "Unit number for the selected health institution is required."
             )

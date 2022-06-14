@@ -23,12 +23,8 @@
                             <td><span class="fw-bold">{% get_verbose_field_name patient.patientregistration "health_institution" %}
                                 </span>
                                 {{ patient.patientregistration.health_institution }}</td>
-                            <td><span class="fw-bold">{% get_verbose_field_name patient.patientregistration "unit" %}</span>
-                                {% for unit in patient.patientregistration.unit.all %}
-                                {% with ""|add:unit.number|add:"," as units %}
-                                {{ units }}
-                                {% endwith %}
-                                {% endfor %}
+                            <td><span class="fw-bold">Unit Number/s</span>
+                                {{ patient.patientregistration.unit_no1|default_if_none:"--" }},{{ patient.patientregistration.unit_no2|default_if_none:"--" }},{{ patient.patientregistration.unit_no3|default_if_none:"--" }}
                             </td>
                             <td><span class="fw-bold">{% get_verbose_field_name patient "dob" %} </span>
                                 {{ patient.dob }}</td>
@@ -81,13 +77,13 @@
                         {% if patient_primaryrenaldiagnosis %}
                         <tr>
                             <td colspan="2"><span class="fw-bold">Primary renal diagnosis </span>{{ patient_primaryrenaldiagnosis.description }}</td>
-                            <td colspan="2"><span class="fw-bold">ERA-EDTA CODE </span>{{ patient_primaryrenaldiagnosis.renaldiagnosis }}</td>
+                            <td colspan="2"><span class="fw-bold">ERA-EDTA CODE </span>{{ patient_primaryrenaldiagnosis.code }}</td>
                         </tr>
                         {% endif %}
                         {% if patient_secondaryrenaldiagnosis %}
                         <tr>
                             <td colspan="2"><span class="fw-bold">Secondary renal diagnosis </span>{{ patient_secondaryrenaldiagnosis.description }}</td>
-                            <td colspan="2"><span class="fw-bold">ERA-EDTA CODE </span>{{ patient_secondaryrenaldiagnosis.renaldiagnosis }}</td>
+                            <td colspan="2"><span class="fw-bold">ERA-EDTA CODE </span>{{ patient_secondaryrenaldiagnosis.code }}</td>
                         </tr>
                         {% endif %}
                         <tr>
@@ -127,6 +123,13 @@
                                 {% for disability in patient_assessement.disability.all  %}
                                 <p>{{ disability }}</p>
                                 {% endfor %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">Clinical frailty scale (1 to 9) </span>
+                                {% if patient_assessement %}
+                                {{ patient_assessement.clinical_frailty }}
                                 {% endif %}
                             </td>
                         </tr>

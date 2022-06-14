@@ -59,10 +59,10 @@
                         </tr>
                         {% if current_krt_is_first_dialysis %}
                         <tr>
-                            <td colspan="4"><span class="fw-bold">{% get_verbose_field_name patient_current_krtmodality "hd_initialaccess" %} </span>{{ patient_current_krtmodality.hd_initialaccess|default_if_none:"--" }}</td>
+                            <td colspan="4"><span class="fw-bold">Access used for last dialysis </span>{{ patient_current_krtmodality.hd_initialaccess|default_if_none:"--" }}</td>
                         </tr>
                         <tr>
-                            <td colspan="4"><span class="fw-bold">NTC reason </span>{{ patient_current_krtmodality.hd_ntcreason|default_if_none:"--" }}</td>
+                            <td colspan="4"><span class="fw-bold">TC or NTC reason </span>{{ patient_current_krtmodality.hd_tc_ntc_reason|default_if_none:"--" }}</td>
                         </tr>
                         {% endif %}
                         <tr>
@@ -119,44 +119,62 @@
                         </tr>
                         <tr>
                             <td><span class="fw-bold">ESA dose </span></td>
-                            <td colspan="2"><span class="fw-bold">Anti-diabetics Y/N</span></td>
-                            <td><span class="fw-bold">Antihypertensives Y/N</span></td>
+                            <td><span class="fw-bold">Anti-diabetics Y/N/U</span></td>
+                            <td colspan="2"><span class="fw-bold">BP Drugs Y/N/U</span></td>
                         </tr>
                         <tr>
                             <td><span class="fw-bold">iu/wk (short acting) </span>{{ patientassesment.patientmedicationassessment.iu_wk|default_if_none:"--" }}</td>
                             <td><span class="fw-bold">Insulin </span>{{ patientassesment.patientmedicationassessment.insulin|default_if_none:"--" }}</td>
                             <td><span class="fw-bold">ACEi </span>{{ patientassesment.patientmedicationassessment.acei|default_if_none:"--" }}</td>
-                            <td><span class="fw-bold">Other antihypertensives</span></td>
+                            <td><span class="fw-bold">Thiazides </span>{{ patientassesment.patientmedicationassessment.thiazides|default_if_none:"--" }}</td>
                         </tr>
                         <tr>
                             <td><span class="fw-bold">mcg/2 wk (darbo.) </span>{{ patientassesment.patientmedicationassessment.mcg2|default_if_none:"--" }}</td>
                             <td><span class="fw-bold">Sulphonylureas </span>{{ patientassesment.patientmedicationassessment.sulphonylureas|default_if_none:"--" }}</td>
                             <td><span class="fw-bold">ARB </span>{{ patientassesment.patientmedicationassessment.arb|default_if_none:"--" }}</td>
-                            <td><span class="fw-bold">1 </span>{{ patientassesment.patientmedicationassessment.antihypertensives_others1|default_if_none:"--" }}</td>
+                            <td><span class="fw-bold">Renin Inhibitors </span>{{ patientassesment.patientmedicationassessment.renin_inhibitors|default_if_none:"--" }}</td>
                         </tr>
                         <tr>
                             <td><span class="fw-bold">mcg/4 wk (mircera) </span>{{ patientassesment.patientmedicationassessment.mcg4|default_if_none:"--" }}</td>
-                            <td><span class="fw-bold">Other anti-diabetics</span></td>
+                            <td><span class="fw-bold">DPP4i </span>{{ patientassesment.patientmedicationassessment.dpp4i|default_if_none:"--" }}</td>
                             <td><span class="fw-bold">CC Blocker </span>{{ patientassesment.patientmedicationassessment.cc_blocker|default_if_none:"--" }}</td>
-                            <td><span class="fw-bold">2 </span>{{ patientassesment.patientmedicationassessment.antihypertensives_others2|default_if_none:"--" }}</td>
+                            <td><span class="fw-bold">Others </span>{{ patientassesment.patientmedicationassessment.bpdrugs_others|default_if_none:"--" }}</td>
                         </tr>
                         <tr>
                             <td></td>
-                            <td><span class="fw-bold">1 </span>{{ patientassesment.patientmedicationassessment.antidiab_others1|default_if_none:"--" }}</td>
+                            <td><span class="fw-bold">GLP1A </span>{{ patientassesment.patientmedicationassessment.glp1a|default_if_none:"--" }}</td>
                             <td><span class="fw-bold">Beta Blocker </span>{{ patientassesment.patientmedicationassessment.beta_blocker|default_if_none:"--" }}</td>
-                            <td><span class="fw-bold">3 </span>{{ patientassesment.patientmedicationassessment.antihypertensives_others3|default_if_none:"--" }}</td>
+                            <td></td>
                         </tr>
                         <tr>
                             <td><span class="fw-bold">IV iron dose</span></td>
-                            <td><span class="fw-bold">2 </span>{{ patientassesment.patientmedicationassessment.antidiab_others2|default_if_none:"--" }}</td>
+                            <td><span class="fw-bold">Meglitinides </span>{{ patientassesment.patientmedicationassessment.meglitinides|default_if_none:"--" }}</td>
                             <td><span class="fw-bold">Alpha Blocker </span>{{ patientassesment.patientmedicationassessment.alpha_blocker|default_if_none:"--" }}</td>
-                            <td><span class="fw-bold">4 </span>{{ patientassesment.patientmedicationassessment.antihypertensives_others4|default_if_none:"--" }}</td>
+                            <td></td>
                         </tr>
                         <tr>
                             <td><span class="fw-bold">mg/month </span>{{ patientassesment.patientmedicationassessment.mg|default_if_none:"--" }}</td>
-                            <td><span class="fw-bold">3 </span>{{ patientassesment.patientmedicationassessment.antidiab_others3|default_if_none:"--" }}</td>
-                            <td><span class="fw-bold">Methyldopa </span>{{ patientassesment.patientmedicationassessment.methyldopa|default_if_none:"--" }}</td>
-                            <td><span class="fw-bold">5 </span>{{ patientassesment.patientmedicationassessment.antihypertensives_others5|default_if_none:"--" }}</td>
+                            <td><span class="fw-bold">SGLT2i </span>{{ patientassesment.patientmedicationassessment.sglt2i|default_if_none:"--" }}</td>
+                            <td><span class="fw-bold">Centrally acting </span>{{ patientassesment.patientmedicationassessment.centrally_acting|default_if_none:"--" }}</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><span class="fw-bold">Acarbose </span>{{ patientassesment.patientmedicationassessment.acarbose|default_if_none:"--" }}</td>
+                            <td><span class="fw-bold">P Vasodilators </span>{{ patientassesment.patientmedicationassessment.p_vasodilators|default_if_none:"--" }}</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><span class="fw-bold">Metformin </span>{{ patientassesment.patientmedicationassessment.metformin|default_if_none:"--" }}</td>
+                            <td><span class="fw-bold">Loop diuretics </span>{{ patientassesment.patientmedicationassessment.loop_diuretics|default_if_none:"--" }}</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><span class="fw-bold">Other </span>{{ patientassesment.patientmedicationassessment.antidiabetic_other|default_if_none:"--" }}</td>
+                            <td><span class="fw-bold">MRA </span>{{ patientassesment.patientmedicationassessment.mra|default_if_none:"--" }}</td>
+                            <td></td>
                         </tr>
                         <tr>
                             <td colspan="4"><span class="fw-bold">Comorbidities </span>
@@ -170,6 +188,11 @@
                                 {% for disability in patientassesment.disability.all  %}
                                 <p>{{ disability }}</p>
                                 {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4"><span class="fw-bold">Clinical frailty scale (1 to 9) </span>
+                                {{ patientassesment.clinical_frailty }}
                             </td>
                         </tr>
                         <tr>
@@ -197,11 +220,11 @@
                                 {{ patientassesment.get_hiv_display }}
                             </td>
                         </tr>
-                        <tr>
+                        <!-- <tr>
                             <td colspan="4"><span class="fw-bold">Creation date </span>
                                 {{ patientassesment.created_at }}
                             </td>
-                        </tr>
+                        </tr> -->
                     </tbody>
                 </table>
             </div>

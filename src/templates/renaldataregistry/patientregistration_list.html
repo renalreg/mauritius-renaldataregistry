@@ -41,7 +41,7 @@
                             <th scope='col'>DOB</th>
                             <th scope='col'>Gender</th>
                             <th scope='col'>Health institution</th>
-                            <th scope='col'>Unit</th>
+                            <th scope='col'>Unit number/s</th>
                             <th colspan="6" scope="colgroup">Actions</th>
                         </tr>
                     </thead>
@@ -53,16 +53,13 @@
                         <td>{{patientregistration.patient.dob}}</td>
                         <td>{{patientregistration.patient.get_gender_display}}</td>
                         <td>{{patientregistration.health_institution}}</td>
-                        {% if patientregistration.unit.count > 1 %}
                         <td>
-                            {% for unit in patientregistration.unit.all %}
-                            {{unit}}
+                            {{patientregistration.unit_no1|default_if_none:"--"}}
                             <br />
-                            {% endfor %}
+                            {{patientregistration.unit_no2|default_if_none:"--"}}
+                            <br />
+                            {{patientregistration.unit_no3|default_if_none:"--"}}
                         </td>
-                        {% else %}
-                        <td>{{patientregistration.unit.first}}</td>
-                        {% endif %}
                         <td>
                             <div class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown"></a>

@@ -7,7 +7,6 @@ from django.shortcuts import redirect
 from django.db.models import Q
 from renaldataregistry.models import (
     PatientRegistration,
-    Unit,
     Patient,
     PatientRenalDiagnosis,
     PatientAKImeasurement,
@@ -33,13 +32,6 @@ from renaldataregistry.forms import (
 
 
 # pylint: disable=too-many-statements, too-many-boolean-expressions, too-many-branches, too-many-lines
-
-# Create your views here.
-def load_units(request):
-    "Get units of hospital"
-    hi_id = request.GET.get("hi_id")
-    units = Unit.objects.filter(healthinstitution=hi_id).order_by("name")
-    return render(request, "unit_dropdownlist_options.html", {"units": units})
 
 
 class PatientView(LoginRequiredMixin, DetailView):
@@ -96,13 +88,15 @@ class PatientRegistrationListView(LoginRequiredMixin, ListView):
             search_word = None
 
         if search_word:
-            # Search by N.I.C or passport number, name, surname, health institution or unit.
+            # Search by N.I.C or passport number, name, surname, health institution or unit number.
             result_patients = PatientRegistration.objects.filter(
                 Q(health_institution__name__icontains=search_word)
-                | Q(unit__name__icontains=search_word)
                 | Q(patient__name__icontains=search_word)
                 | Q(patient__surname__icontains=search_word)
                 | Q(patient__pid__icontains=search_word)
+                | Q(unit_no1__icontains=search_word)
+                | Q(unit_no2__icontains=search_word)
+                | Q(unit_no3__icontains=search_word)
             ).order_by("patient__name")
             self.count = result_patients.count()
             return result_patients
@@ -1150,7 +1144,7 @@ class PatientAssessmentView(LoginRequiredMixin, UpdateView):
             # modality 2, HD
             if patient_current_krtmodality.modality == 2:
                 patient_current_krtmodality.save(
-                    update_fields=["hd_unit", "hd_initialaccess", "hd_ntcreason"]
+                    update_fields=["hd_unit", "hd_initialaccess", "hd_tc_ntc_reason"]
                 )
 
             patientassessment = patientassessment_form.save(commit=False)
