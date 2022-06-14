@@ -5,6 +5,9 @@ from django.db import migrations, models
 import django.db.models.deletion
 import simple_history.models
 
+# pylint: disable=too-many-lines
+# pylint: disable=invalid-name
+
 
 class Migration(migrations.Migration):
 
