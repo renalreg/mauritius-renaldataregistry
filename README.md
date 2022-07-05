@@ -32,7 +32,7 @@ To deploy the container:
 2. Create a populated `.env` file in the root of the repository
 3. Run `docker-compose up` (or `docker-compose up -d` to run in the background)
 
-The application will be running on port 8000, so set up your reverse proxy to redirect requests to that port.
+The application will be running on port 8000, so set up your reverse proxy to redirect requests to that port. The reverse proxy should also terminate SSL. We suggest using Nginx as it's well documented, widely used, and integrates nicely with SSL management tools like Certbot.
 
 The docker-compose file is set up to also serve collected static files, so no downstream configuration is required for static files.
 
