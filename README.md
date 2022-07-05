@@ -13,18 +13,7 @@ Create migrations with `python src/manage.py makemigrations`.
 
 Migrations will be applied automatically when the application container starts. If you're running outside of a container, run migrations manually (see Getting Started below).
 
-### Building Docker image
-
-Docker images are automatically built by GitHub Actions, and published to https://github.com/renalreg/mauritius-renaldataregistry/pkgs/container/mauritius-renaldataregistry.
-
-You can reference images by various tags:
-
-- Tagged releases will create a new version-tagged image.
-  - E.g. A GitHub release `v1.0.0` will create an image tagged `1.0.0`
-- Pushing to any branch will create a branch-tagged image
-  - E.g. pushing to `main` will update the image tagged `main`
-
-### Deploying Docker image
+### Deploying with Docker
 
 To deploy the container:
 
