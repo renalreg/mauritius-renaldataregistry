@@ -65,11 +65,11 @@ DJANGO_SUPERUSER_EMAIL=admin@email.com
 
 ```
 
+#### Superuser creation
+
 Note: Once the container has started for the first time, you can remove `DJANGO_SUPERUSER_` items from `.env`. They exist only to create the initial superuser account on first-run.
 
 Leaving them in the file won't do any damage, since Django won't create a new user if the username already exists, it's just cleaner to remove it. Doing so will result in an output line `CommandError: You must use --username with --noinput.` which can be safely ignored.
-
-#### Superuser creation
 
 ## Getting Started
 
