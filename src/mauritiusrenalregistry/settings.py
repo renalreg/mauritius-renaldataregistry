@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     # Mauritius apps
     "users.apps.UsersConfig",
     "renaldataregistry.apps.RenaldataregistryConfig",
+    "django.contrib.admindocs",
 ]
 
 MIDDLEWARE = [

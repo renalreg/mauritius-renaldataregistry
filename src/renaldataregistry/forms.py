@@ -1,3 +1,6 @@
+"""
+This file contains the forms used in the application.
+"""
 from django import forms
 from django.forms import (
     ModelForm,

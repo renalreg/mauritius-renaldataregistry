@@ -24,6 +24,7 @@ urlpatterns = [
     path("", HomePageView.as_view(), name="home"),
     path("users/login/", CustomLoginView.as_view(), name="login"),
     path("users/", include("django.contrib.auth.urls")),
+    path("admin/doc/", include("django.contrib.admindocs.urls")),
     path("admin/", admin.site.urls),
     path(
         "renaldataregistry/",
