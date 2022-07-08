@@ -20,6 +20,7 @@ Migrations will be applied automatically when the application container starts. 
 * Docker
 * Docker-Compose
 * Git
+* A reverse proxy for SSL termination (e.g. Nginx)
 
 #### Basic deployment
 
