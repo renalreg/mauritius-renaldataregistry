@@ -1,3 +1,6 @@
+"""
+This file contains the class-based views that take a web request and returns a web response.
+"""
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, UpdateView, DetailView
@@ -35,11 +38,23 @@ from renaldataregistry.forms import (
 
 
 class PatientView(LoginRequiredMixin, DetailView):
-    # This view shows the data entered in the patient registration form
+    """
+    View a single patient's registration form details, related to the models:
+    renaldataregistry.Patient
+    renaldataregistry.PatientRegistration
+    renaldataregistry.PatientRenalDiagnosis
+    renaldataregistry.PatientKRTModality
+    renaldataregistry.PatientAKImeasurement
+    renaldataregistry.PatientAssessment
+    """
+
     model = Patient
     template_name = "patient_view.html"
 
     def get_context_data(self, **kwargs):
+        """
+        Add extra information related to: renaldataregistry.PatientKRTModality, renaldataregistry.PatientAssessment and renaldataregistry.PatientRenalDiagnosis
+        """
         context = super().get_context_data(**kwargs)
         patient = self.object
 
@@ -72,13 +87,18 @@ class PatientView(LoginRequiredMixin, DetailView):
 
 
 class PatientRegistrationListView(LoginRequiredMixin, ListView):
+    """
+    List all registered patients, related to the model renaldataregistry.PatientRegistration.
+    """
+
     paginate_by = 15
     model = PatientRegistration
     count = 0
 
     def get_queryset(self):
         """
-        Overwrites the get_query_set to add search option
+        Overwrite the get_query_set to add search option.
+        Search patient by N.I.C or passport number, name, surname, health institution or unit number.
         """
         try:
             search_word = self.request.GET.get(
@@ -88,7 +108,6 @@ class PatientRegistrationListView(LoginRequiredMixin, ListView):
             search_word = None
 
         if search_word:
-            # Search by N.I.C or passport number, name, surname, health institution or unit number.
             result_patients = PatientRegistration.objects.filter(
                 Q(health_institution__name__icontains=search_word)
                 | Q(patient__name__icontains=search_word)
@@ -110,6 +129,9 @@ class PatientRegistrationListView(LoginRequiredMixin, ListView):
         return all_patientregistrations
 
     def get_context_data(self, **kwargs):
+        """
+        Add search word to the context information for presenting the results.
+        """
         context = super().get_context_data(**kwargs)
         if self.request.user.is_superuser:
             context["search_word"] = self.request.GET.get("search_keyword")
@@ -119,13 +141,26 @@ class PatientRegistrationListView(LoginRequiredMixin, ListView):
 
 
 class PatientRegistrationView(LoginRequiredMixin, UpdateView):
+    """
+    Create and edit a patient registration's form.
+    The collected data is the one included in the paper form for a patient's registration, related to the models:
+    renaldataregistry.Patient
+    renaldataregistry.PatientRegistration
+    renaldataregistry.PatientRenalDiagnosis
+    renaldataregistry.PatientKRTModality
+    renaldataregistry.PatientAKImeasurement
+    renaldataregistry.PatientAssessment
+    """
+
     def __init__(self):
+        """
+        Include attributes required for get_krt_modalities function.
+        """
         self.all_patient_krt_modalities = [None] * 6
 
     def get_krt_modalities(self, patient):
         """
-        Get the patient's 6 oldest KRT modalities created in the registration form
-        alternative to set all_patient_krt_modalities: see get_context_data of PatientView
+        Get the patient's 6 oldest KRT modalities created in the registration form.
         """
         i = 4
         # Loading chronology of KRT modalities (the 6 oldest ones) and sorting them in the relevant order for the patient registration form
@@ -142,6 +177,9 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
                 self.all_patient_krt_modalities[i] = patientkrtmodality
 
     def get(self, request, *args, **kwargs):
+        """
+        Present page to create and edit patient's registration data.
+        """
         context = {}
         template_name = "patient_register.html"
         title = "Patient registration form"
@@ -287,6 +325,9 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
         return render(request, template_name, context)
 
     def post(self, request, *args, **kwargs):
+        """
+        Handle data validation and persistence for the creation and edition of the patient's registration form.
+        """
         aki_saved = ""
         patient_renaldiagnoses = [None] * 2
 
@@ -625,12 +666,16 @@ class PatientRegistrationView(LoginRequiredMixin, UpdateView):
 
 
 class PatientModalityListView(LoginRequiredMixin, ListView):
+    """
+    List all patient's modalities, related to the model renaldataregistry.PatientKRTModality.
+    """
+
     model = PatientKRTModality
     template_name = "patientmodality_list.html"
 
     def get_queryset(self):
         """
-        Overwrites the get_query_set to add search option
+        Overwrite the get_query_set function to get patient's modalities order by start date.
         """
         try:
             patient_id = self.kwargs["patient_id"]
@@ -645,7 +690,17 @@ class PatientModalityListView(LoginRequiredMixin, ListView):
 
 
 class PatientModalityDetailView(LoginRequiredMixin, DetailView):
+    """
+    View a patient's modality form details, related to the models:
+    renaldataregistry.PatientKRTModality
+    renaldataregistry.PatientAKImeasurement
+    renaldataregistry.PatientAssessment
+    """
+
     def get(self, request, *args, **kwargs):
+        """
+        Get modality data linked to the patient.
+        """
         is_first_modality = "No"
         try:
             modality_id = kwargs["modality_id"]
@@ -690,8 +745,19 @@ class PatientModalityDetailView(LoginRequiredMixin, DetailView):
 
 
 class PatientModalityView(LoginRequiredMixin, UpdateView):
-    # Register current patient's KRT modality
+    """
+    Create and edit a patient's KRT modality form.
+    The collected data is the one included in the paper form to start or change a KRT modality, related to the models:
+    renaldataregistry.Patient
+    renaldataregistry.PatientKRTModality
+    renaldataregistry.PatientAKImeasurement
+    renaldataregistry.PatientAssessment
+    """
+
     def get(self, request, *args, **kwargs):
+        """
+        Present page to create and edit patient's KRT modality data.
+        """
         template_name = "patient_modality.html"
         title = "Patient KRT modality form"
         krt_is_first = False
@@ -763,6 +829,9 @@ class PatientModalityView(LoginRequiredMixin, UpdateView):
         return render(request, template_name, context)
 
     def post(self, request, *args, **kwargs):
+        """
+        Handle data validation and persistence for the creation and edition of the patient's KRT modality form.
+        """
         first_aki = False
         first_assess_for_krt = False
 
@@ -905,9 +974,19 @@ class PatientModalityView(LoginRequiredMixin, UpdateView):
 
 
 class PatientAssessmentListView(LoginRequiredMixin, ListView):
+    """
+    List all patient's dialysis assessments, related to the models:
+    renaldataregistry.PatientKRTModality
+    renaldataregistry.PatientAssessment
+    Assessments are dialysis assessments. The paper form corresponds to NRR B0.3 Assessment dialysis.pdf
+    """
+
     model = PatientAssessment
 
     def get_context_data(self, **kwargs):
+        """
+        Add extra information to identify if patient is in dialysis mode.
+        """
         patient_in_dialysis = False
         context = super().get_context_data(**kwargs)
 
@@ -943,7 +1022,16 @@ class PatientAssessmentListView(LoginRequiredMixin, ListView):
 
 
 class PatientAssessmentDetailView(LoginRequiredMixin, DetailView):
+    """
+    View a patient's dialysis assessment form details, related to the models:
+    renaldataregistry.PatientKRTModality
+    renaldataregistry.PatientAssessment
+    """
+
     def get(self, request, *args, **kwargs):
+        """
+        Get dialysis assessment data linked to the patient.
+        """
         current_krt_is_first_dialysis = False
         try:
             assessment_id = kwargs["assessment_id"]
@@ -984,7 +1072,20 @@ class PatientAssessmentDetailView(LoginRequiredMixin, DetailView):
 
 
 class PatientAssessmentView(LoginRequiredMixin, UpdateView):
+    """
+    Create and edit a patient's dialysis assessment form.
+    The collected data is the one included in the paper form to add assessment for dialysis patient, related to the models:
+    renaldataregistry.Patient
+    renaldataregistry.PatientKRTModality
+    renaldataregistry.PatientLPAssessment
+    renaldataregistry.PatientMedicationAssessment
+    renaldataregistry.PatientDialysisAssessment
+    """
+
     def get(self, request, *args, **kwargs):
+        """
+        Present page to create and edit patient's dialysis assessment data.
+        """
         template_name = "patient_assess.html"
         title = "Patient assessment form"
 
@@ -1062,6 +1163,9 @@ class PatientAssessmentView(LoginRequiredMixin, UpdateView):
         return render(request, template_name, context)
 
     def post(self, request, *args, **kwargs):
+        """
+        Handle data validation and persistence for the creation and edition of the patient's dialysis assessment form.
+        """
         try:
             assessment_id = kwargs["assessment_id"]
         except KeyError:
@@ -1197,8 +1301,20 @@ class PatientAssessmentView(LoginRequiredMixin, UpdateView):
 
 
 class PatientStopView(LoginRequiredMixin, UpdateView):
+    """
+    Create and edit a patient's stopping dialysis form.
+    The collected data is the one included in the paper form to add stopping dialysis data, related to the models:
+    renaldataregistry.Patient
+    renaldataregistry.PatientStop
+    """
+
     def get(self, request, *args, **kwargs):
+        """
+        Present page to create and edit patient's stopping dialysis data.
+        """
         title = "Patient stopping dialysis form"
+        patient_current_krt_is_dialysis = False
+        patientstop_form = PatientStopForm()
 
         try:
             patient_id = kwargs["patient_id"]
@@ -1209,16 +1325,32 @@ class PatientStopView(LoginRequiredMixin, UpdateView):
 
         try:
             patientstop_form = PatientStopForm(instance=patient.patientstop)
+            patient_current_krt_is_dialysis = True
         except PatientStop.DoesNotExist:
-            patientstop_form = PatientStopForm()
+            patient_current_krtmodality = PatientKRTModality.objects.filter(
+                patient=patient, is_current=True
+            ).first()
+            # check if patient is in dialysis mode (HD or PD)
+            if patient_current_krtmodality.modality in (2, 3):
+                patient_current_krt_is_dialysis = True
+                if not patient_current_krt_is_dialysis:
+                    title = "Patient is not in dialysis"
 
         return render(
             request,
             "patient_stop.html",
-            context={"patientstop_form": patientstop_form, "view_title": title},
+            context={
+                "patientstop_form": patientstop_form,
+                "view_title": title,
+                "patient_current_krt_is_dialysis": patient_current_krt_is_dialysis,
+            },
         )
 
     def post(self, request, *args, **kwargs):
+        """
+        Handle data validation and persistence for the creation and edition of the patient's stopping dialysis form.
+        When a patient stop dialysis, no more dialysis assessment's forms are allowed, unless that the patient registers a new KRT dialysis modality.
+        """
         title = "Patient stopping dialysis form"
         try:
             patient_id = kwargs["patient_id"]
@@ -1266,7 +1398,16 @@ class PatientStopView(LoginRequiredMixin, UpdateView):
 
 
 class PatientRegistrationHistoryView(LoginRequiredMixin, DetailView):
+    """
+    View a patient's registration history, related to the models:
+    renaldataregistry.Patient
+    renaldataregistry.PatientRegistration
+    """
+
     def get(self, request, *args, **kwargs):
+        """
+        Present page to list history of health institutions were the patient has been registered.
+        """
         try:
             patient_id = kwargs["patient_id"]
         except KeyError:

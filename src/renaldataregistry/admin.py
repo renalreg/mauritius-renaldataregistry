@@ -1,4 +1,6 @@
-# from django.contrib import admin
+"""
+This file contains the models that can be managed in the admin module of the application.
+"""
 
 # Register your models here.
 from django.contrib import admin

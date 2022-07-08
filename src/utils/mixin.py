@@ -1,3 +1,6 @@
+"""
+This file contains custom validation for the forms' fields.
+"""
 from datetime import date
 import re
 from django import forms

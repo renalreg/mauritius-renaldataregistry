@@ -72,7 +72,9 @@
                                     {% if patientregistration.patient.patientstop%}
                                     <a class="dropdown-item" href="{% url 'renaldataregistry:PatientStopUpdateView' patientregistration.patient.id %}">Edit dialysis stop</a>
                                     {% else %}
+                                    {% if patientregistration.patient.patientkrtmodality_set.count > 0 %}
                                     <a class="dropdown-item" href="{% url 'renaldataregistry:PatientStopUpdateView' patientregistration.patient.id %}">Stop dialysis</a>
+                                    {% endif %}
                                     {% endif %}
                                 </div>
                             </div>

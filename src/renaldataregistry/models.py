@@ -1,3 +1,7 @@
+"""
+This file contains the essential fields and behaviours of the data to store. Each model maps to a single database table.
+"""
+
 from simple_history.models import HistoricalRecords
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
 from django.db import models
@@ -7,6 +11,10 @@ from users.models import CustomUser
 
 
 class Patient(models.Model):
+    """
+    Define a patient.
+    """
+
     TYPE_CHOICES = (
         (1, "N.I.C"),
         (2, "Passport"),
@@ -179,6 +187,12 @@ class Patient(models.Model):
 
 
 class PatientRegistration(models.Model):
+    """
+    Define the main relationship patient 1 -> 1 registration * -> 1 health institution
+    i.e. Every patient is registered in one main health institution and
+    one health institution can be linked to one or many registrations records.
+    """
+
     patient = models.OneToOneField(Patient, on_delete=models.CASCADE, primary_key=True)
     health_institution = models.ForeignKey(
         "HealthInstitution",
@@ -226,6 +240,10 @@ class PatientRegistration(models.Model):
 
 
 class HealthInstitution(models.Model):
+    """
+    Define a health institution.
+    """
+
     TYPE_CHOICES = (
         (0, "Unknown"),
         (1, "Public"),
@@ -265,6 +283,10 @@ class HealthInstitution(models.Model):
 
 
 class HDUnit(models.Model):
+    """
+    Define a HD unit.
+    """
+
     code = models.CharField(max_length=3, unique=True)
     name = models.CharField(max_length=100, unique=True)
     created_by = models.ForeignKey(
@@ -289,6 +311,10 @@ class HDUnit(models.Model):
 
 
 class Comorbidity(models.Model):
+    """
+    Define a comorbidity.
+    """
+
     comorbidity = models.CharField(max_length=100)
     created_by = models.ForeignKey(
         CustomUser,
@@ -312,6 +338,10 @@ class Comorbidity(models.Model):
 
 
 class Disability(models.Model):
+    """
+    Define a disability.
+    """
+
     disability = models.CharField(max_length=100)
     created_by = models.ForeignKey(
         CustomUser,
@@ -335,6 +365,11 @@ class Disability(models.Model):
 
 
 class PatientRenalDiagnosis(models.Model):
+    """
+    Define the relationship patient 1 -> * renal diagnosis
+    Suggestion: You should have a table for renal diagnosis codes, it was originally designed that way but Mauritius requested the change to enter the renal diagnosis code in the registration form.
+    """
+
     patient = models.ForeignKey(
         "Patient",
         on_delete=models.CASCADE,
@@ -360,6 +395,12 @@ class PatientRenalDiagnosis(models.Model):
 
 
 class PatientKRTModality(models.Model):
+    """
+    Define the main relationship patient 1 -> * KRT modalities * -> 1 HD unit
+    i.e. Every patient can have multiple KRT modalities and
+    one HD unit can be linked to one or many KRT modalities (dialysis modality).
+    """
+
     patient = models.ForeignKey(
         "Patient",
         on_delete=models.CASCADE,
@@ -524,6 +565,10 @@ class PatientKRTModality(models.Model):
 
 
 class PatientAKImeasurement(models.Model):
+    """
+    Define the main relationship patient 1 -> 1 AKI set of measurements (creatinine, egrf, hb)
+    """
+
     patient = models.OneToOneField(Patient, on_delete=models.CASCADE, primary_key=True)
     creatinine = models.DecimalField(
         verbose_name="Latest creatinine (\u03BCmol/l)",
@@ -570,6 +615,12 @@ class PatientAKImeasurement(models.Model):
 
 
 class PatientAssessment(models.Model):
+    """
+    Define the main relationship patient 1 -> * assessments * -> * comorbidities, disabilities
+    i.e. A patient can have multiple assessments and one to many comorbidities and disabilities
+     can appear in one or many assessments.
+    """
+
     SMOKINGSTATUS_CHOICES = (
         (0, "Unknown"),
         (1, "Never smoked"),
@@ -664,6 +715,11 @@ class PatientAssessment(models.Model):
 
 
 class PatientDialysisAssessment(models.Model):
+    """
+    Define the relationship assessment 1 -> 1 dialysis assessment
+    i.e. An assessment type is a dialysis assessment.
+    """
+
     patientassessment = models.OneToOneField(
         PatientAssessment, on_delete=models.CASCADE, primary_key=True
     )
@@ -725,6 +781,11 @@ class PatientDialysisAssessment(models.Model):
 
 
 class PatientLPAssessment(models.Model):
+    """
+    Define the relationship assessment 1 -> 1 assessment for the laboratory parameters
+    i.e. An assessment evaluates laboratory parameters.
+    """
+
     patientassessment = models.OneToOneField(
         PatientAssessment, on_delete=models.CASCADE, primary_key=True
     )
@@ -789,6 +850,11 @@ class PatientLPAssessment(models.Model):
 
 
 class PatientMedicationAssessment(models.Model):
+    """
+    Define the relationship assessment 1 -> 1 set of medications
+    i.e. An assessment includes a list of medications.
+    """
+
     Y_N_U_CHOICES = (
         ("Y", "Yes"),
         ("N", "No"),
@@ -959,6 +1025,10 @@ class PatientMedicationAssessment(models.Model):
 
 
 class PatientStop(models.Model):
+    """
+    Define the main relationship patient 1 -> 1 stop dialysis form
+    """
+
     patient = models.OneToOneField(Patient, on_delete=models.CASCADE, primary_key=True)
     ENDREASON_CHOICES = (
         ("D", "Died"),
