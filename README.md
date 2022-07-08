@@ -15,6 +15,12 @@ Migrations will be applied automatically when the application container starts. 
 
 ### Deploying with Docker
 
+#### Prerequisites
+
+* Docker
+* Docker-Compose
+* Git
+
 #### Basic deployment
 
 To deploy the container:
@@ -68,7 +74,8 @@ These instructions will get you a copy of the project to run it on your local ma
 
 ### Prerequisites
 
-python3
+* python3
+* postgresql
 
 ### Installing
 
